@@ -1,0 +1,2207 @@
+import os
+import json
+import logging
+import asyncio
+from datetime import datetime
+from pathlib import Path
+from threading import Thread
+from typing import Dict, List, Optional, Any, Callable, Awaitable
+
+from flask import Flask, request
+from aiogram import Bot, Dispatcher, Router, F, BaseMiddleware
+from aiogram.types import Update
+from keep_alive import keep_alive
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.types import (
+    Message, CallbackQuery, 
+    InlineKeyboardMarkup, InlineKeyboardButton, 
+    ReplyKeyboardMarkup, KeyboardButton, TelegramObject
+)
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+
+# Bot configuration
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "7692003502").split(",") if x.strip().isdigit()]
+REQUIRED_CHANNEL = os.getenv("REQUIRED_CHANNEL", "@FreelanceTM_channel")
+# Convert URL format to username format if needed
+if REQUIRED_CHANNEL.startswith("https://t.me/"):
+    REQUIRED_CHANNEL = "@" + REQUIRED_CHANNEL.replace("https://t.me/", "")
+
+# Database configuration
+DATA_DIR = "data"
+
+# Business configuration
+COMMISSION_RATE = 0.05  # 5% commission
+
+# =============================================================================
+# DATABASE OPERATIONS
+# =============================================================================
+
+logger = logging.getLogger(__name__)
+
+# Global database variables
+users_db = {}
+orders_db = {}
+responses_db = {}
+reviews_db = {}
+counters = {"user_id": 1, "order_id": 1}
+
+def init_database():
+    """Initialize database"""
+    global users_db, orders_db, responses_db, reviews_db, counters
+    
+    # Create data directory if not exists
+    Path(DATA_DIR).mkdir(exist_ok=True)
+    
+    # Load data from files
+    users_db = load_json(f"{DATA_DIR}/users.json", {})
+    orders_db = load_json(f"{DATA_DIR}/orders.json", {})
+    responses_db = load_json(f"{DATA_DIR}/responses.json", {})
+    reviews_db = load_json(f"{DATA_DIR}/reviews.json", {})
+    counters = load_json(f"{DATA_DIR}/counters.json", {"user_id": 1, "order_id": 1})
+    
+    logger.info(f"Database initialized: {len(users_db)} users, {len(orders_db)} orders")
+
+def load_json(filename: str, default: Any) -> Any:
+    """Load data from JSON file"""
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return default
+    except json.JSONDecodeError:
+        logger.error(f"JSON decode error in file {filename}")
+        return default
+
+def save_json(filename: str, data: Any):
+    """Save data to JSON file"""
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Error saving to file {filename}: {e}")
+
+def save_all_data():
+    """Save all data to files"""
+    save_json(f"{DATA_DIR}/users.json", users_db)
+    save_json(f"{DATA_DIR}/orders.json", orders_db)
+    save_json(f"{DATA_DIR}/responses.json", responses_db)
+    save_json(f"{DATA_DIR}/reviews.json", reviews_db)
+    save_json(f"{DATA_DIR}/counters.json", counters)
+
+# User operations
+def get_user(user_id: int) -> Optional[Dict]:
+    """Get user by ID"""
+    return users_db.get(str(user_id))
+
+def create_user(user_id: int, user_data: Dict) -> Dict:
+    """Create new user"""
+    user_data['id'] = user_id
+    user_data['created_at'] = datetime.now().isoformat()
+    users_db[str(user_id)] = user_data
+    save_all_data()
+    return user_data
+
+def update_user(user_id: int, updates: Dict) -> Optional[Dict]:
+    """Update user data"""
+    if str(user_id) in users_db:
+        users_db[str(user_id)].update(updates)
+        save_all_data()
+        return users_db[str(user_id)]
+    return None
+
+def get_users_by_role(role: str) -> List[Dict]:
+    """Get users by role"""
+    return [user for user in users_db.values() if user.get('role') == role]
+
+# Order operations
+def get_order(order_id: int) -> Optional[Dict]:
+    """Get order by ID"""
+    return orders_db.get(str(order_id))
+
+def create_order(order_data: Dict) -> Dict:
+    """Create new order"""
+    order_id = counters["order_id"]
+    counters["order_id"] += 1
+    
+    order_data['id'] = order_id
+    order_data['created_at'] = datetime.now().isoformat()
+    order_data['status'] = 'active'
+    
+    orders_db[str(order_id)] = order_data
+    save_all_data()
+    return order_data
+
+def update_order(order_id: int, updates: Dict) -> Optional[Dict]:
+    """Update order"""
+    if str(order_id) in orders_db:
+        orders_db[str(order_id)].update(updates)
+        save_all_data()
+        return orders_db[str(order_id)]
+    return None
+
+def get_orders_by_client(client_id: int) -> List[Dict]:
+    """Get orders by client"""
+    return [order for order in orders_db.values() if order.get('client_id') == client_id]
+
+def get_active_orders() -> List[Dict]:
+    """Get active orders"""
+    return [order for order in orders_db.values() if order.get('status') == 'active']
+
+def get_active_orders_for_freelancer(freelancer_id: int) -> List[Dict]:
+    """Get active orders excluding user's own orders and orders already responded to"""
+    active_orders = []
+    for order in orders_db.values():
+        if order.get('status') != 'active':
+            continue
+        
+        # Don't show user's own orders
+        if order.get('client_id') == freelancer_id:
+            continue
+            
+        # Don't show orders already responded to
+        order_responses = get_responses(order['id'])
+        if any(response['freelancer_id'] == freelancer_id for response in order_responses):
+            continue
+            
+        active_orders.append(order)
+    
+    return active_orders
+
+def get_orders_by_category(category: str) -> List[Dict]:
+    """Get orders by category"""
+    return [order for order in orders_db.values() if order.get('category') == category and order.get('status') == 'active']
+
+# Response operations
+def add_response(order_id: int, response_data: Dict) -> bool:
+    """Add response to order"""
+    if str(order_id) not in responses_db:
+        responses_db[str(order_id)] = []
+    
+    # Check if freelancer already responded
+    for response in responses_db[str(order_id)]:
+        if response['freelancer_id'] == response_data['freelancer_id']:
+            return False
+    
+    response_data['created_at'] = datetime.now().isoformat()
+    responses_db[str(order_id)].append(response_data)
+    save_all_data()
+    return True
+
+def get_responses(order_id: int) -> List[Dict]:
+    """Get responses to order"""
+    return responses_db.get(str(order_id), [])
+
+def get_freelancer_responses(freelancer_id: int) -> List[Dict]:
+    """Get freelancer responses"""
+    responses = []
+    for order_id, order_responses in responses_db.items():
+        for response in order_responses:
+            if response['freelancer_id'] == freelancer_id:
+                order = get_order(int(order_id))
+                if order:
+                    response['order'] = order
+                    responses.append(response)
+    return responses
+
+# Review operations
+def add_review(order_id: int, reviewer_id: int, reviewed_id: int, review_data: Dict) -> bool:
+    """Add review"""
+    review_key = f"{order_id}_{reviewer_id}_{reviewed_id}"
+    
+    # Check if review already exists
+    if review_key in reviews_db:
+        return False
+    
+    review_data.update({
+        'order_id': order_id,
+        'reviewer_id': reviewer_id,
+        'reviewed_id': reviewed_id,
+        'created_at': datetime.now().isoformat()
+    })
+    
+    reviews_db[review_key] = review_data
+    save_all_data()
+    return True
+
+def get_user_reviews(user_id: int) -> List[Dict]:
+    """Get reviews about user"""
+    return [review for review in reviews_db.values() if review['reviewed_id'] == user_id]
+
+def get_user_average_rating(user_id: int) -> float:
+    """Get user average rating"""
+    reviews = get_user_reviews(user_id)
+    if not reviews:
+        return 0.0
+    
+    total_rating = sum(review['rating'] for review in reviews)
+    return total_rating / len(reviews)
+
+def can_leave_review(order_id: int, reviewer_id: int, reviewed_id: int) -> bool:
+    """Check if user can leave review"""
+    order = get_order(order_id)
+    if not order or order['status'] != 'completed':
+        return False
+    
+    # Check if user participated in order
+    if reviewer_id not in [order['client_id'], order.get('selected_freelancer')]:
+        return False
+    
+    # Check if review already exists
+    review_key = f"{order_id}_{reviewer_id}_{reviewed_id}"
+    return review_key not in reviews_db
+
+def get_stats() -> Dict:
+    """Get platform statistics"""
+    return {
+        'total_users': len(users_db),
+        'freelancers': len(get_users_by_role('freelancer')),
+        'clients': len(get_users_by_role('client')),
+        'total_orders': len(orders_db),
+        'active_orders': len(get_active_orders()),
+        'completed_orders': len([o for o in orders_db.values() if o.get('status') == 'completed']),
+        'total_reviews': len(reviews_db)
+    }
+
+# =============================================================================
+# TEXT CONSTANTS
+# =============================================================================
+
+TEXTS = {
+    "ru": {
+        "welcome": "🎉 Добро пожаловать в FreelanceTM!\n\n💼 Платформа для фрилансеров и заказчиков\n🔒 Гарантия безопасных сделок\n⭐ Система отзывов и рейтингов\n📢 Новости и обновления платформы\n🤝 Поддержка и помощь пользователям\n\nДля продолжения работы необходимо подписаться на наш канал:",
+        "choose_language": "🌐 Выберите язык / Dil saýlaň:",
+        "choose_role": "👤 Выберите вашу роль:",
+        "registration_name": "👤 Введите ваше имя:",
+        "registration_skills": "💼 Укажите ваши навыки:",
+        "registration_description": "📝 Расскажите о себе:",
+        "registration_contact": "📞 Укажите контакт для связи:",
+        "registration_complete": "✅ Регистрация завершена! Добро пожаловать в FreelanceTM!",
+        "main_menu_freelancer": "🏠 Главное меню фрилансера",
+        "main_menu_client": "🏠 Главное меню заказчика",
+        "btn_create_order": "➕ Создать заказ",
+        "btn_view_orders": "📋 Просмотр заказов",
+        "btn_my_orders": "📋 Мои заказы",
+        "btn_my_responses": "📤 Мои отклики",
+        "btn_profile": "👤 Профиль",
+        "btn_reviews": "📝 Отзывы",
+        "btn_help": "❓ Помощь",
+        "btn_back": "◀️ Назад",
+        "check_subscription": "✅ Проверить подписку",
+        "subscription_required": "❌ Для использования бота необходимо подписаться на канал:",
+        "order_title": "📝 Введите название заказа:",
+        "order_description": "📋 Введите описание заказа:",
+        "order_budget": "💰 Введите бюджет (в TMT):",
+        "order_deadline": "⏰ Введите срок выполнения (в днях):",
+        "order_contact": "📞 Введите контакт для связи:",
+        "order_created": "✅ Заказ успешно создан!",
+        "no_orders": "📭 Нет доступных заказов",
+        "orders_list": "📋 Доступные заказы:",
+        "my_orders_list": "📋 Ваши заказы:",
+        "no_my_orders": "📭 У вас нет заказов",
+        "respond_to_order": "📤 Откликнуться",
+        "response_sent": "✅ Отклик отправлен!",
+        "response_exists": "❌ Вы уже откликнулись на этот заказ",
+        "new_response": "📨 Новый отклик на ваш заказ!",
+        "btn_select_freelancer": "✅ Выбрать фрилансера",
+        "btn_change_role": "🔄 Сменить роль",
+        "btn_pay_guarantee": "💰 Оплатить",
+        "btn_complete_order": "✅ Завершить заказ",
+        "btn_confirm_completion": "✅ Подтвердить завершение",
+        "payment_guarantee": "🛡️ Гарантийная оплата",
+        "guarantee_info": "💰 Сумма к оплате: {amount} TMT + {commission} TMT (комиссия 5%)\nОбщая сумма: {total} TMT",
+        "guarantee_request_sent": "✅ Запрос на оплату отправлен администратору",
+        "order_selected": "✅ Фрилансер выбран",
+        "freelancer_selected": "🎉 Вас выбрали для выполнения заказа!\n⚠️ НЕ НАЧИНАЙТЕ РАБОТУ до подтверждения оплаты администратором!",
+        "payment_confirmed": "✅ Оплата подтверждена! Можете начинать работу.",
+        "order_completed": "✅ Заказ завершен",
+        "waiting_payment_confirmation": "⏳ Ожидается подтверждение оплаты от администратора",
+        "both_confirm_required": "⚠️ Для завершения заказа требуется подтверждение от обеих сторон",
+        "admin_payment_request": "💰 Новый запрос на гарантийную оплату",
+        "admin_confirm_payment": "✅ Подтвердить оплату",
+        "admin_release_payment": "💸 Выплатить фрилансеру",
+        "error_not_freelancer": "❌ Эта функция доступна только фрилансерам",
+        "error_not_client": "❌ Эта функция доступна только заказчикам",
+        "error_order_not_found": "❌ Заказ не найден",
+        "error_not_your_order": "❌ Это не ваш заказ",
+        "error_user_not_found": "❌ Пользователь не найден",
+        "profile_info": "👤 Ваш профиль:",
+        "edit_profile": "✏️ Редактировать профиль",
+        "edit_name": "✏️ Изменить имя",
+        "edit_skills": "✏️ Изменить навыки",
+        "edit_description": "✏️ Изменить описание",
+        "edit_contact": "✏️ Изменить контакт",
+        "profile_updated": "✅ Профиль обновлен",
+        "leave_review": "⭐ Оставить отзыв",
+        "select_rating": "⭐ Выберите оценку:",
+        "enter_review_text": "📝 Напишите отзыв:",
+        "review_added": "✅ Отзыв добавлен",
+        "review_error": "❌ Не удалось добавить отзыв",
+        "no_reviews": "📭 Отзывов пока нет",
+        "reviews_about_you": "📝 Отзывы о вас:",
+    },
+    "tm": {
+        "welcome": "🎉 FreelanceTM-a hoş geldiňiz!\n\n💼 Frilanserler we müşderiler üçin platforma\n🔒 Howpsuz geleşikleriň kepilligi\n⭐ Syn we reýting ulgamy\n📢 Platformanyň täzelikleri we täzelenmeler\n🤝 Ulanyjylara goldaw we kömek\n\nIşlemegi dowam etdirmek üçin kanalymyza ýazylyň:",
+        "choose_language": "🌐 Выберите язык / Dil saýlaň:",
+        "choose_role": "👤 Rolüňizi saýlaň:",
+        "registration_name": "👤 Adyňyzy giriziň:",
+        "registration_skills": "💼 Başarnyklaryňyzy görkeziň:",
+        "registration_description": "📝 Öziňiz hakda aýdyň:",
+        "registration_contact": "📞 Aragatnaşyk üçin kontakt görkeziň:",
+        "registration_complete": "✅ Hasaba alyş tamamlandy! FreelanceTM-a hoş geldiňiz!",
+        "main_menu_freelancer": "🏠 Frilanseriniň esasy menýusy",
+        "main_menu_client": "🏠 Müşderiniň esasy menýusy",
+        "btn_create_order": "➕ Sargyt döretmek",
+        "btn_view_orders": "📋 Sargytlary görmek",
+        "btn_my_orders": "📋 Meniň sargytlarym",
+        "btn_my_responses": "📤 Meniň jogaplarym",
+        "btn_profile": "👤 Profil",
+        "btn_reviews": "📝 Synlar",
+        "btn_help": "❓ Kömek",
+        "btn_back": "◀️ Yza",
+        "check_subscription": "✅ Ýazylmagy barlamak",
+        "subscription_required": "❌ Botu ulanmak üçin kanala ýazylmaly:",
+        "order_title": "📝 Sargydyň adyny giriziň:",
+        "order_description": "📋 Sargydyň beýanyny giriziň:",
+        "order_budget": "💰 Býudjeti giriziň (TMT-de):",
+        "order_deadline": "⏰ Ýerine ýetirmek möhletini giriziň (günlerde):",
+        "order_contact": "📞 Aragatnaşyk üçin kontakt giriziň:",
+        "order_created": "✅ Sargyt üstünlikli döredildi!",
+        "no_orders": "📭 Elýeterli sargyt ýok",
+        "orders_list": "📋 Elýeterli sargytlar:",
+        "my_orders_list": "📋 Siziň sargytlaryňyz:",
+        "no_my_orders": "📭 Siziň sargydyňyz ýok",
+        "respond_to_order": "📤 Jogap bermek",
+        "response_sent": "✅ Jogap iberildi!",
+        "response_exists": "❌ Siz bu sargyta eýýäm jogap berdiňiz",
+        "new_response": "📨 Sargydyňyza täze jogap!",
+        "btn_select_freelancer": "✅ Frilanser saýlamak",
+        "btn_change_role": "🔄 Roly üýtgetmek",
+        "btn_pay_guarantee": "💰 Tölemek",
+        "btn_complete_order": "✅ Sargyt tamamlamak",
+        "btn_confirm_completion": "✅ Tamamlamagy tassyklamak",
+        "payment_guarantee": "🛡️ Kepilli töleg",
+        "guarantee_info": "💰 Töleg mukdary: {amount} TMT + {commission} TMT (komissiýa 5%)\nUmumi mukdar: {total} TMT",
+        "guarantee_request_sent": "✅ Töleg sorawy administratora iberildi",
+        "order_selected": "✅ Frilanser saýlandy",
+        "freelancer_selected": "🎉 Sizi sargyt ýerine ýetirmek üçin saýladylar!\n⚠️ Administrator töleg tassyklaýança işe başlamaň!",
+        "payment_confirmed": "✅ Töleg tassyklandy! Işe başlap bolýar.",
+        "order_completed": "✅ Sargyt tamamlandy",
+        "waiting_payment_confirmation": "⏳ Administratoryň töleg tassyklamagyna garaşýarys",
+        "both_confirm_required": "⚠️ Sargyt tamamlamak üçin iki tarapyň tassyklamagy zerur",
+        "admin_payment_request": "💰 Täze kepilli töleg sorawy",
+        "admin_confirm_payment": "✅ Töleg tassyklamak",
+        "admin_release_payment": "💸 Frilanser tölemek",
+        "error_not_freelancer": "❌ Bu funksiýa diňe frilanserler üçin elýeterli",
+        "error_not_client": "❌ Bu funksiýa diňe müşderiler üçin elýeterli",
+        "error_order_not_found": "❌ Sargyt tapylmady",
+        "error_not_your_order": "❌ Bu siziň sargydyňyz däl",
+        "error_user_not_found": "❌ Ulanyjy tapylmady",
+        "profile_info": "👤 Siziň profilyňyz:",
+        "edit_profile": "✏️ Profili üýtgetmek",
+        "edit_name": "✏️ Ady üýtgetmek",
+        "edit_skills": "✏️ Başarnyklary üýtgetmek",
+        "edit_description": "✏️ Beýany üýtgetmek",
+        "edit_contact": "✏️ Kontakty üýtgetmek",
+        "profile_updated": "✅ Profil täzelendi",
+        "leave_review": "⭐ Syn galdyrmak",
+        "select_rating": "⭐ Bahany saýlaň:",
+        "enter_review_text": "📝 Syn ýazyň:",
+        "review_added": "✅ Syn goşuldy",
+        "review_error": "❌ Syn goşup bolmady",
+        "no_reviews": "📭 Heniz syn ýok",
+        "reviews_about_you": "📝 Siziň barada synlar:",
+    }
+}
+
+# Categories
+CATEGORIES = {
+    "ru": {
+        "web_development": "💻 Веб-разработка",
+        "mobile_development": "📱 Мобильная разработка",
+        "design": "🎨 Дизайн",
+        "writing": "✍️ Копирайтинг",
+        "translation": "🌐 Переводы",
+        "marketing": "📈 Маркетинг",
+        "other": "🔧 Другое"
+    },
+    "tm": {
+        "web_development": "💻 Web ösüş",
+        "mobile_development": "📱 Mobil ösüş",
+        "design": "🎨 Dizaýn",
+        "writing": "✍️ Ýazuw",
+        "translation": "🌐 Terjime",
+        "marketing": "📈 Marketing",
+        "other": "🔧 Beýleki"
+    }
+}
+
+# =============================================================================
+# UTILITY FUNCTIONS
+# =============================================================================
+
+async def check_subscription(user_id: int, bot: Bot) -> bool:
+    """Check user subscription to required channel"""
+    try:
+        print(f"Checking subscription for user {user_id} in channel {REQUIRED_CHANNEL}")
+        member = await bot.get_chat_member(REQUIRED_CHANNEL, user_id)
+        print(f"User {user_id} status: {member.status}")
+        return member.status in ['member', 'administrator', 'creator']
+    except Exception as e:
+        print(f"Error checking subscription for user {user_id}: {e}")
+        print(f"Channel: {REQUIRED_CHANNEL}")
+        return False  # If error checking, deny access
+
+def get_text(key: str, lang: str = "ru") -> str:
+    """Get text in specified language"""
+    return TEXTS.get(lang, TEXTS["ru"]).get(key, f"[{key}]")
+
+def get_user_language(user_id: int) -> str:
+    """Get user language"""
+    user = get_user(user_id)
+    return user.get('language', 'ru') if user else 'ru'
+
+def is_admin(user_id: int) -> bool:
+    """Check admin permissions"""
+    return user_id in ADMIN_IDS
+
+def calculate_commission(amount: float) -> tuple:
+    """Calculate commission for guarantee deal"""
+    commission = amount * COMMISSION_RATE
+    total = amount + commission
+    return commission, total
+
+def format_contact_info(user: dict) -> str:
+    """Format contact information"""
+    contact = user.get('profile', {}).get('contact', '')
+    username = user.get('username', '')
+    
+    if contact and username:
+        return f"{contact}\n@{username}"
+    elif contact:
+        return contact
+    elif username:
+        return f"@{username}"
+    else:
+        return "Не указан"
+
+def validate_budget(text: str) -> Optional[float]:
+    """Validate budget input"""
+    try:
+        budget = float(text.replace(',', '.'))
+        return budget if budget > 0 else None
+    except ValueError:
+        return None
+
+def validate_deadline(text: str) -> Optional[int]:
+    """Validate deadline input"""
+    try:
+        deadline = int(text)
+        return deadline if deadline > 0 else None
+    except ValueError:
+        return None
+
+def truncate_text(text: str, max_length: int = 100) -> str:
+    """Truncate text to specified length"""
+    return text[:max_length] + "..." if len(text) > max_length else text
+
+def format_price(amount: float) -> str:
+    """Format price"""
+    return f"{amount:.2f}".rstrip('0').rstrip('.')
+
+def get_status_emoji(status: str) -> str:
+    """Get emoji for order status"""
+    return {
+        'active': '🟢',
+        'in_progress': '🟡',
+        'payment_pending': '🟠',
+        'completion_pending': '🔵',
+        'completed': '✅',
+        'cancelled': '❌'
+    }.get(status, '⚫')
+
+def escape_html(text: str) -> str:
+    """Escape HTML characters"""
+    if not text:
+        return ""
+    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+async def send_notification(bot: Bot, user_id: int, text: str, **kwargs):
+    """Safe notification sending"""
+    try:
+        await bot.send_message(user_id, text, **kwargs)
+    except Exception as e:
+        logger.error(f"Failed to send notification to {user_id}: {e}")
+
+def format_order_text(order: dict, lang: str = "ru") -> str:
+    """Format order text"""
+    status_emoji = get_status_emoji(order.get('status', 'active'))
+    
+    text = f"""
+{status_emoji} <b>{"Заказ" if lang == "ru" else "Sargyt"} #{order['id']}</b>
+
+📝 <b>{"Название" if lang == "ru" else "Ady"}:</b> {escape_html(order['title'])}
+📋 <b>{"Описание" if lang == "ru" else "Beýany"}:</b> {escape_html(truncate_text(order['description']))}
+💰 <b>{"Бюджет" if lang == "ru" else "Býudjet"}:</b> {format_price(order['budget'])} TMT
+⏰ <b>{"Срок" if lang == "ru" else "Möhlet"}:</b> {order['deadline']} {"дней" if lang == "ru" else "gün"}
+🏷️ <b>{"Категория" if lang == "ru" else "Kategoriýa"}:</b> {CATEGORIES.get(lang, CATEGORIES["ru"]).get(order.get('category', 'other'), order.get('category', 'other'))}
+"""
+    
+    if 'created_at' in order:
+        created_date = datetime.fromisoformat(order['created_at']).strftime("%d.%m.%Y %H:%M")
+        created_text = "Создан" if lang == "ru" else "Döredildi"
+        text += f"\n📅 <b>{created_text}:</b> {created_date}"
+    
+    return text.strip()
+
+def format_profile_text(user: dict, lang: str = "ru") -> str:
+    """Format profile text"""
+    profile = user.get('profile', {})
+    rating = get_user_average_rating(user['id'])
+    reviews_count = len(get_user_reviews(user['id']))
+    
+    text = f"""
+👤 <b>{"Профиль" if lang == "ru" else "Profil"}</b>
+
+📝 <b>{"Имя" if lang == "ru" else "Ady"}:</b> {escape_html(user.get('first_name', ''))}
+👔 <b>{"Роль" if lang == "ru" else "Roly"}:</b> {"Фрилансер" if user.get('role') == 'freelancer' else "Заказчик" if lang == "ru" else "Frilanser" if user.get('role') == 'freelancer' else "Müşderi"}
+💼 <b>{"Навыки" if lang == "ru" else "Başarnyklar"}:</b> {escape_html(profile.get('skills', 'Не указаны' if lang == "ru" else "Görkezilmedi"))}
+📝 <b>{"Описание" if lang == "ru" else "Beýany"}:</b> {escape_html(profile.get('description', 'Не указано' if lang == "ru" else "Görkezilmedi"))}
+📞 <b>{"Контакт" if lang == "ru" else "Kontakt"}:</b> {escape_html(profile.get('contact', 'Не указан' if lang == "ru" else "Görkezilmedi"))}
+⭐ <b>{"Рейтинг" if lang == "ru" else "Reýting"}:</b> {rating:.1f}/5.0 ({reviews_count} {"отзывов" if lang == "ru" else "syn"})
+"""
+    
+    return text.strip()
+
+def format_review_text(review: dict, lang: str = "ru") -> str:
+    """Format review text"""
+    reviewer = get_user(review['reviewer_id'])
+    reviewer_name = reviewer.get('first_name', 'Unknown') if reviewer else 'Unknown'
+    
+    stars = "⭐" * review['rating'] + "☆" * (5 - review['rating'])
+    date = datetime.fromisoformat(review['created_at']).strftime("%d.%m.%Y")
+    
+    return f"""
+{stars} <b>{review['rating']}/5</b>
+👤 <b>{"От" if lang == "ru" else "Kimden"}:</b> {escape_html(reviewer_name)}
+📝 <b>{"Отзыв" if lang == "ru" else "Teswir"}:</b> {escape_html(review.get('text', ''))}
+📅 {date}
+"""
+
+# =============================================================================
+# STATES
+# =============================================================================
+
+class RegistrationStates(StatesGroup):
+    waiting_language = State()
+    waiting_role = State()
+    waiting_profile_name = State()
+    waiting_profile_skills = State()
+    waiting_profile_description = State()
+    waiting_profile_contact = State()
+
+class OrderStates(StatesGroup):
+    waiting_title = State()
+    waiting_description = State()
+    waiting_category = State()
+    waiting_budget = State()
+    waiting_deadline = State()
+    waiting_contact = State()
+
+class ProfileStates(StatesGroup):
+    waiting_new_name = State()
+    waiting_new_skills = State()
+    waiting_new_description = State()
+    waiting_new_contact = State()
+
+class AdminStates(StatesGroup):
+    waiting_broadcast_message = State()
+    waiting_order_action = State()
+    waiting_user_action = State()
+
+class ReviewStates(StatesGroup):
+    waiting_rating = State()
+    waiting_review_text = State()
+
+# =============================================================================
+# KEYBOARDS
+# =============================================================================
+
+def get_language_keyboard():
+    """Get language selection keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru"),
+            InlineKeyboardButton(text="🇹🇲 Türkmen", callback_data="lang_tm")
+        ]
+    ])
+
+def get_role_keyboard(lang="ru"):
+    """Get role selection keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="👨‍💻 Фрилансер" if lang == "ru" else "👨‍💻 Frilanser", callback_data="role_freelancer"),
+            InlineKeyboardButton(text="👤 Заказчик" if lang == "ru" else "👤 Müşderi", callback_data="role_client")
+        ]
+    ])
+
+def get_main_menu_keyboard(role, lang="ru", user_id=None):
+    """Get main menu keyboard based on role"""
+    buttons = []
+    
+    if role == "client":
+        buttons.extend([
+            [KeyboardButton(text=get_text("btn_create_order", lang))],
+            [KeyboardButton(text=get_text("btn_my_orders", lang))]
+        ])
+    elif role == "freelancer":
+        buttons.extend([
+            [KeyboardButton(text=get_text("btn_view_orders", lang))],
+            [KeyboardButton(text=get_text("btn_my_responses", lang))]
+        ])
+    
+    buttons.extend([
+        [KeyboardButton(text=get_text("btn_profile", lang)), KeyboardButton(text=get_text("btn_reviews", lang))],
+        [KeyboardButton(text=get_text("btn_change_role", lang)), KeyboardButton(text=get_text("btn_help", lang))]
+    ])
+    
+    # Add admin panel button for administrators
+    if user_id and is_admin(user_id):
+        buttons.append([KeyboardButton(text="🛠 Панель администратора")])
+    
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
+def get_subscription_keyboard():
+    """Get subscription check keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="✅ Проверить подписку", callback_data="check_subscription")]
+    ])
+
+def get_categories_keyboard(lang="ru"):
+    """Get categories keyboard"""
+    categories = CATEGORIES.get(lang, CATEGORIES["ru"])
+    keyboard = []
+    
+    for key, value in categories.items():
+        keyboard.append([InlineKeyboardButton(text=value, callback_data=f"category_{key}")])
+    
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_order_response_keyboard(order_id, lang="ru"):
+    """Get order response keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=get_text("respond_to_order", lang), callback_data=f"respond_{order_id}")]
+    ])
+
+def get_order_actions_keyboard(order_id, freelancer_id, lang="ru"):
+    """Get order actions keyboard for client"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Выбрать фрилансера" if lang == "ru" else "✅ Frilanser saýlamak", callback_data=f"select_{order_id}_{freelancer_id}")
+        ]
+    ])
+
+def get_freelancer_selection_keyboard(order_id, freelancer_id, lang="ru"):
+    """Get freelancer selection keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💰 Оплатить" if lang == "ru" else "💰 Tölemek", callback_data=f"pay_order_{order_id}_{freelancer_id}")]
+    ])
+
+def get_order_completion_keyboard(order_id, lang="ru"):
+    """Get order completion keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=get_text("btn_confirm_completion", lang), callback_data=f"confirm_completion_{order_id}")]
+    ])
+
+def get_admin_keyboard():
+    """Get admin keyboard"""
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📊 Статистика"), KeyboardButton(text="👥 Пользователи")],
+            [KeyboardButton(text="📋 Заказы"), KeyboardButton(text="📢 Рассылка")],
+            [KeyboardButton(text="💰 Подтвердить оплату"), KeyboardButton(text="💸 Выплатить")],
+            [KeyboardButton(text="◀️ Назад")]
+        ],
+        resize_keyboard=True
+    )
+
+def get_admin_payment_keyboard(orders, action_type="confirm"):
+    """Get admin payment keyboard"""
+    if not orders:
+        return None
+    
+    keyboard = []
+    for order in orders[:10]:  # Limit to 10 orders
+        text = f"#{order['id']} - {truncate_text(order['title'], 30)}"
+        callback_data = f"admin_{action_type}_{order['id']}"
+        keyboard.append([InlineKeyboardButton(text=text, callback_data=callback_data)])
+    
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_rating_keyboard(lang="ru"):
+    """Get rating keyboard"""
+    keyboard = []
+    for i in range(1, 6):
+        stars = "⭐" * i + "☆" * (5 - i)
+        keyboard.append([InlineKeyboardButton(text=f"{stars} {i}/5", callback_data=f"rating_{i}")])
+    
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_order_with_review_keyboard(order_id, freelancer_id, client_id, current_user_id, lang="ru"):
+    """Get order keyboard with review option"""
+    reviewed_id = freelancer_id if current_user_id == client_id else client_id
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=get_text("leave_review", lang), callback_data=f"review_{order_id}_{reviewed_id}_{current_user_id}")]
+    ])
+
+def get_profile_edit_keyboard(lang="ru"):
+    """Get profile edit keyboard"""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text=get_text("edit_name", lang), callback_data="edit_name"),
+            InlineKeyboardButton(text=get_text("edit_skills", lang), callback_data="edit_skills")
+        ],
+        [
+            InlineKeyboardButton(text=get_text("edit_description", lang), callback_data="edit_description"),
+            InlineKeyboardButton(text=get_text("edit_contact", lang), callback_data="edit_contact")
+        ]
+    ])
+
+def get_back_keyboard(lang="ru"):
+    """Get back keyboard"""
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=get_text("btn_back", lang))]],
+        resize_keyboard=True
+    )
+
+# =============================================================================
+# MIDDLEWARE
+# =============================================================================
+
+class SubscriptionMiddleware(BaseMiddleware):
+    async def __call__(
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
+        data: Dict[str, Any]
+    ) -> Any:
+        if isinstance(event, (Message, CallbackQuery)):
+            user_id = event.from_user.id if event.from_user else None
+            
+            if user_id:
+                # Skip subscription check for admins
+                if is_admin(user_id):
+                    return await handler(event, data)
+                
+                # Skip subscription check for /start command
+                if isinstance(event, Message) and event.text and event.text.startswith('/start'):
+                    return await handler(event, data)
+                
+                user = get_user(user_id)
+                if user and not await check_subscription(user_id, data.get('bot')):
+                    lang = user.get('language', 'ru')
+                    subscription_text = f"{get_text('subscription_required', lang)} {REQUIRED_CHANNEL}"
+                    
+                    if isinstance(event, Message):
+                        await event.answer(subscription_text, reply_markup=get_subscription_keyboard())
+                    elif isinstance(event, CallbackQuery):
+                        await event.message.edit_text(subscription_text, reply_markup=get_subscription_keyboard())
+                        await event.answer()
+                    return
+        
+        return await handler(event, data)
+
+# =============================================================================
+# HANDLERS
+# =============================================================================
+
+router = Router()
+
+# Registration handlers
+@router.message(Command("start"))
+async def cmd_start(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    user = get_user(user_id)
+    
+    if not user:
+        # New user - start registration
+        await message.answer(get_text("choose_language"), reply_markup=get_language_keyboard())
+        await state.set_state(RegistrationStates.waiting_language)
+    else:
+        # Existing user - check subscription and show main menu
+        lang = user.get('language', 'ru')
+        
+        if not await check_subscription(user_id, message.bot):
+            subscription_text = f"{get_text('subscription_required', lang)} {REQUIRED_CHANNEL}"
+            await message.answer(subscription_text, reply_markup=get_subscription_keyboard())
+            return
+        
+        role = user.get('role')
+        welcome_text = get_text(f"main_menu_{role}", lang)
+        await message.answer(welcome_text, reply_markup=get_main_menu_keyboard(role, lang, message.from_user.id))
+
+@router.callback_query(F.data == "check_subscription")
+async def check_subscription_callback(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    user = get_user(user_id)
+    
+    if not user:
+        await callback.answer("❌ Сначала зарегистрируйтесь")
+        return
+    
+    lang = user.get('language', 'ru')
+    
+    if await check_subscription(user_id, callback.bot):
+        role = user.get('role')
+        welcome_text = get_text(f"main_menu_{role}", lang)
+        await callback.message.edit_text(welcome_text)
+        await callback.message.answer(welcome_text, reply_markup=get_main_menu_keyboard(role, lang, callback.from_user.id))
+        await callback.answer("✅ Подписка подтверждена!" if lang == "ru" else "✅ Ýazylma tassyklandy!")
+    else:
+        await callback.answer("❌ Подпишитесь на канал!" if lang == "ru" else "❌ Kanala ýazylyň!")
+
+@router.callback_query(F.data.startswith("lang_"))
+async def language_selected(callback: CallbackQuery, state: FSMContext):
+    lang = callback.data.split("_")[1]
+    await state.update_data(language=lang)
+    
+    await callback.message.edit_text(get_text("choose_role", lang), reply_markup=get_role_keyboard(lang))
+    await state.set_state(RegistrationStates.waiting_role)
+    await callback.answer()
+
+@router.callback_query(F.data.startswith("role_"))
+async def role_selected(callback: CallbackQuery, state: FSMContext):
+    role = callback.data.split("_")[1]
+    data = await state.get_data()
+    lang = data.get('language', 'ru')
+    
+    await state.update_data(role=role)
+    await callback.message.edit_text(get_text("registration_name", lang))
+    await state.set_state(RegistrationStates.waiting_profile_name)
+    await callback.answer()
+
+@router.message(RegistrationStates.waiting_profile_name)
+async def profile_name_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get('language', 'ru')
+    
+    await state.update_data(profile_name=message.text)
+    await message.answer(get_text("registration_skills", lang))
+    await state.set_state(RegistrationStates.waiting_profile_skills)
+
+@router.message(RegistrationStates.waiting_profile_skills)
+async def profile_skills_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get('language', 'ru')
+    
+    await state.update_data(profile_skills=message.text)
+    await message.answer(get_text("registration_description", lang))
+    await state.set_state(RegistrationStates.waiting_profile_description)
+
+@router.message(RegistrationStates.waiting_profile_description)
+async def profile_description_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get('language', 'ru')
+    
+    await state.update_data(profile_description=message.text)
+    await message.answer(get_text("registration_contact", lang))
+    await state.set_state(RegistrationStates.waiting_profile_contact)
+
+@router.message(RegistrationStates.waiting_profile_contact)
+async def profile_contact_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    lang = data.get('language', 'ru')
+    
+    await state.update_data(profile_contact=message.text)
+    await complete_registration(message, state)
+
+async def complete_registration(message: Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = message.from_user.id
+    
+    user_data = {
+        'first_name': message.from_user.first_name,
+        'username': message.from_user.username,
+        'language': data.get('language', 'ru'),
+        'role': data.get('role'),
+        'profile': {
+            'name': data.get('profile_name'),
+            'skills': data.get('profile_skills'),
+            'description': data.get('profile_description'),
+            'contact': data.get('profile_contact')
+        }
+    }
+    
+    create_user(user_id, user_data)
+    lang = data.get('language', 'ru')
+    role = data.get('role')
+    
+    await message.answer(get_text("registration_complete", lang))
+    await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang, message.from_user.id))
+    await state.clear()
+
+# Order creation handlers
+@router.message(F.text.in_(["➕ Создать заказ", "➕ Sargyt döretmek"]))
+async def create_order_start(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    if not user or user.get('role') != 'client':
+        lang = user.get('language', 'ru') if user else 'ru'
+        await message.answer(get_text("error_not_client", lang))
+        return
+    
+    lang = user.get('language', 'ru')
+    await message.answer(get_text("order_title", lang), reply_markup=get_back_keyboard(lang))
+    await state.set_state(OrderStates.waiting_title)
+
+@router.message(OrderStates.waiting_title)
+async def order_title_received(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    if message.text == get_text("btn_back", lang):
+        role = user.get('role')
+        await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang, message.from_user.id))
+        await state.clear()
+        return
+    
+    await state.update_data(title=message.text)
+    await message.answer(get_text("order_description", lang))
+    await state.set_state(OrderStates.waiting_description)
+
+@router.message(OrderStates.waiting_description)
+async def order_description_received(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await state.update_data(description=message.text)
+    await message.answer("🏷️ Выберите категорию:" if lang == "ru" else "🏷️ Kategoriýa saýlaň:", reply_markup=get_categories_keyboard(lang))
+    await state.set_state(OrderStates.waiting_category)
+
+@router.callback_query(F.data.startswith("category_"), StateFilter(OrderStates.waiting_category))
+async def category_selected(callback: CallbackQuery, state: FSMContext):
+    category = callback.data.split("_")[1]
+    user = get_user(callback.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await state.update_data(category=category)
+    await callback.message.edit_text(get_text("order_budget", lang))
+    await state.set_state(OrderStates.waiting_budget)
+    await callback.answer()
+
+@router.message(OrderStates.waiting_budget)
+async def order_budget_received(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    budget = validate_budget(message.text)
+    if not budget:
+        await message.answer("❌ Введите корректную сумму" if lang == "ru" else "❌ Dogry mukdar giriziň")
+        return
+    
+    await state.update_data(budget=budget)
+    await message.answer(get_text("order_deadline", lang))
+    await state.set_state(OrderStates.waiting_deadline)
+
+@router.message(OrderStates.waiting_deadline)
+async def order_deadline_received(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    deadline = validate_deadline(message.text)
+    if not deadline:
+        await message.answer("❌ Введите корректное количество дней" if lang == "ru" else "❌ Dogry gün sanyny giriziň")
+        return
+    
+    await state.update_data(deadline=deadline)
+    await message.answer(get_text("order_contact", lang))
+    await state.set_state(OrderStates.waiting_contact)
+
+@router.message(OrderStates.waiting_contact)
+async def order_contact_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    order_data = {
+        'client_id': message.from_user.id,
+        'title': data['title'],
+        'description': data['description'],
+        'category': data['category'],
+        'budget': data['budget'],
+        'deadline': data['deadline'],
+        'contact': message.text
+    }
+    
+    order = create_order(order_data)
+    
+    await message.answer(get_text("order_created", lang))
+    await message.answer(format_order_text(order, lang), parse_mode="HTML")
+    
+    role = user.get('role')
+    await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang, message.from_user.id))
+    await state.clear()
+
+# Order viewing handlers
+@router.message(F.text.in_(["📋 Просмотр заказов", "📋 Sargytlary görmek"]))
+async def view_orders(message: Message):
+    user = get_user(message.from_user.id)
+    if not user or user.get('role') != 'freelancer':
+        lang = user.get('language', 'ru') if user else 'ru'
+        await message.answer(get_text("error_not_freelancer", lang))
+        return
+    
+    lang = user.get('language', 'ru')
+    orders = get_active_orders_for_freelancer(user['id'])
+    
+    if not orders:
+        await message.answer(get_text("no_orders", lang))
+        return
+    
+    await message.answer(get_text("orders_list", lang))
+    
+    for order in orders[:10]:  # Show first 10 orders
+        order_text = format_order_text(order, lang)
+        keyboard = get_order_response_keyboard(order['id'], lang)
+        await message.answer(order_text, reply_markup=keyboard, parse_mode="HTML")
+
+@router.message(F.text.in_(["📋 Мои заказы", "📋 Meniň sargytlarym"]))
+async def my_orders(message: Message):
+    user = get_user(message.from_user.id)
+    if not user or user.get('role') != 'client':
+        lang = user.get('language', 'ru') if user else 'ru'
+        await message.answer(get_text("error_not_client", lang))
+        return
+    
+    lang = user.get('language', 'ru')
+    orders = get_orders_by_client(message.from_user.id)
+    
+    if not orders:
+        await message.answer(get_text("no_my_orders", lang))
+        return
+    
+    await message.answer(get_text("my_orders_list", lang))
+    
+    for order in orders:
+        order_text = format_order_text(order, lang)
+        
+        # Add responses info
+        responses = get_responses(order['id'])
+        if responses:
+            order_text += f"\n\n📨 {len(responses)} {'откликов' if lang == 'ru' else 'jogap'}"
+            
+            # Show responses with action buttons
+            for response in responses[:3]:  # Show first 3 responses
+                freelancer = get_user(response['freelancer_id'])
+                if freelancer:
+                    freelancer_text = f"\n\n👤 {escape_html(freelancer['first_name'])}"
+                    if freelancer.get('username'):
+                        freelancer_text += f" (@{freelancer['username']})"
+                    
+                    # Add rating
+                    rating = get_user_average_rating(freelancer['id'])
+                    freelancer_text += f"\n⭐ {rating:.1f}/5.0"
+                    
+                    # Add skills
+                    skills = freelancer.get('profile', {}).get('skills', '')
+                    if skills:
+                        freelancer_text += f"\n💼 {escape_html(truncate_text(skills, 50))}"
+                    
+                    # Add response message if exists
+                    if response.get('message'):
+                        freelancer_text += f"\n💬 {escape_html(truncate_text(response['message'], 100))}"
+                    
+                    # Action buttons for active orders
+                    if order.get('status') == 'active':
+                        keyboard = get_order_actions_keyboard(order['id'], freelancer['id'], lang)
+                        await message.answer(freelancer_text, reply_markup=keyboard, parse_mode="HTML")
+                    else:
+                        await message.answer(freelancer_text, parse_mode="HTML")
+        
+        await message.answer(order_text, parse_mode="HTML")
+
+@router.message(F.text.in_(["📤 Мои отклики", "📤 Meniň jogaplarym"]))
+async def my_responses(message: Message):
+    user = get_user(message.from_user.id)
+    if not user or user.get('role') != 'freelancer':
+        lang = user.get('language', 'ru') if user else 'ru'
+        await message.answer(get_text("error_not_freelancer", lang))
+        return
+    
+    lang = user.get('language', 'ru')
+    responses = get_freelancer_responses(message.from_user.id)
+    
+    if not responses:
+        await message.answer("📭 У вас нет откликов" if lang == "ru" else "📭 Siziň jogapyňyz ýok")
+        return
+    
+    await message.answer("📤 Ваши отклики:" if lang == "ru" else "📤 Siziň jogaplaryňyz:")
+    
+    for response in responses:
+        order = response.get('order')
+        if order:
+            order_text = format_order_text(order, lang)
+            
+            # Add response status
+            status = order.get('status', 'active')
+            if status == 'active':
+                status_text = "⏳ Ожидает рассмотрения" if lang == "ru" else "⏳ Seredilmegine garaşýar"
+            elif status == 'in_progress' and order.get('selected_freelancer') == message.from_user.id:
+                status_text = "✅ Вы выбраны для работы" if lang == "ru" else "✅ Siz iş üçin saýlandyňyz"
+            elif status == 'completed':
+                status_text = "✅ Заказ завершен" if lang == "ru" else "✅ Sargyt tamamlandy"
+            else:
+                status_text = "❌ Выбран другой фрилансер" if lang == "ru" else "❌ Başga frilanser saýlandy"
+            
+            order_text += f"\n\n📋 Статус: {status_text}"
+            
+            await message.answer(order_text, parse_mode="HTML")
+
+# Response handlers
+@router.callback_query(F.data.startswith("respond_"))
+async def respond_to_order(callback: CallbackQuery):
+    order_id = int(callback.data.split("_")[1])
+    user = get_user(callback.from_user.id)
+    
+    if not user or user.get('role') != 'freelancer':
+        lang = user.get('language', 'ru') if user else 'ru'
+        await callback.answer(get_text("error_not_freelancer", lang))
+        return
+    
+    lang = user.get('language', 'ru')
+    
+    # Check if user is trying to respond to their own order
+    order = get_order(order_id)
+    if order and order.get('client_id') == user['id']:
+        await callback.answer("❌ Нельзя откликаться на свой заказ" if lang == "ru" else "❌ Öz sargydyňyza jogap berip bolmaýar")
+        return
+    
+    response_data = {
+        'freelancer_id': callback.from_user.id,
+        'message': f"Готов выполнить заказ!" if lang == "ru" else "Sargyt ýerine ýetirmäge taýyn!"
+    }
+    
+    if add_response(order_id, response_data):
+        # Notify client about new response
+        order = get_order(order_id)
+        if order:
+            client = get_user(order['client_id'])
+            if client:
+                client_lang = client['language']
+                freelancer_info = f"""
+📨 <b>{"Новый отклик на ваш заказ!" if client_lang == "ru" else "Sargydyňyza täze jogap!"}</b>
+
+📋 <b>{"Заказ" if client_lang == "ru" else "Sargyt"} #{order['id']}:</b> {escape_html(order['title'])}
+
+👤 <b>{"Фрилансер" if client_lang == "ru" else "Frilanser"}:</b> {escape_html(user['first_name'])}
+⭐ <b>{"Рейтинг" if client_lang == "ru" else "Reýting"}:</b> {get_user_average_rating(user['id']):.1f}/5.0
+💼 <b>{"Навыки" if client_lang == "ru" else "Başarnyklar"}:</b> {escape_html(user.get('profile', {}).get('skills', 'Не указаны' if client_lang == "ru" else "Görkezilmedi"))}
+📞 <b>{"Контакт" if client_lang == "ru" else "Kontakt"}:</b> {escape_html(format_contact_info(user))}
+"""
+                
+                keyboard = get_order_actions_keyboard(order_id, callback.from_user.id, client_lang)
+                await callback.bot.send_message(order['client_id'], freelancer_info, reply_markup=keyboard, parse_mode="HTML")
+        
+        await callback.answer(get_text("response_sent", lang))
+    else:
+        await callback.answer(get_text("response_exists", lang))
+
+@router.callback_query(F.data.startswith("select_"))
+async def select_freelancer(callback: CallbackQuery):
+    parts = callback.data.split("_")
+    order_id, freelancer_id = int(parts[1]), int(parts[2])
+    
+    user = get_user(callback.from_user.id)
+    order = get_order(order_id)
+    freelancer = get_user(freelancer_id)
+    lang = user['language']
+    
+    if not order or order['client_id'] != callback.from_user.id:
+        await callback.answer(get_text("error_not_your_order", lang))
+        return
+    
+    # Update order with selected freelancer
+    update_order(order_id, {'selected_freelancer': freelancer_id})
+    
+    # Show payment button to client
+    commission, total_amount = calculate_commission(order['budget'])
+    payment_text = f"""
+✅ <b>{"Фрилансер выбран!" if lang == "ru" else "Frilanser saýlandy!"}</b>
+
+👤 <b>{"Фрилансер" if lang == "ru" else "Frilanser"}:</b> {escape_html(freelancer['first_name'])}
+📋 <b>{"Заказ" if lang == "ru" else "Sargyt"}:</b> {escape_html(order['title'])}
+💰 <b>{"Сумма заказа" if lang == "ru" else "Sargydyň mukdary"}:</b> {order['budget']} TMT
+💸 <b>{"Комиссия (5%)" if lang == "ru" else "Komissiýa (5%)"}:</b> {commission:.2f} TMT
+💳 <b>{"Итого к оплате" if lang == "ru" else "Jemi töleg"}:</b> {total_amount:.2f} TMT
+
+💡 {"После оплаты деньги будут заблокированы до завершения работы" if lang == "ru" else "Tölegden soň pul işiň tamamlanmagyna çenli petiklenener"}
+"""
+    
+    keyboard = get_freelancer_selection_keyboard(order_id, freelancer_id, lang)
+    await callback.message.edit_text(payment_text, reply_markup=keyboard, parse_mode="HTML")
+    
+    # Notify freelancer about selection
+    if freelancer:
+        freelancer_lang = freelancer['language']
+        freelancer_text = f"""
+🎉 <b>{"Вас выбрали для выполнения заказа!" if freelancer_lang == "ru" else "Sizi sargyt ýerine ýetirmek üçin saýladylar!"}</b>
+
+📋 <b>{"Заказ" if freelancer_lang == "ru" else "Sargyt"} #{order['id']}:</b> {escape_html(order['title'])}
+💰 <b>{"Сумма" if freelancer_lang == "ru" else "Mukdar"}:</b> {order['budget']} TMT
+👤 <b>{"Заказчик" if freelancer_lang == "ru" else "Müşderi"}:</b> {escape_html(user['first_name'])}
+
+⚠️ <b>{"НЕ НАЧИНАЙТЕ РАБОТУ до подтверждения оплаты администратором!" if freelancer_lang == "ru" else "Administrator töleg tassyklaýança IŞE BAŞLAMAŇ!"}</b>
+"""
+        
+        await callback.bot.send_message(freelancer_id, freelancer_text, parse_mode="HTML")
+    
+    await callback.answer(get_text("order_selected", lang))
+
+@router.callback_query(F.data.startswith("pay_order_"))
+async def pay_order(callback: CallbackQuery):
+    parts = callback.data.split("_")
+    order_id, freelancer_id = int(parts[2]), int(parts[3])
+    
+    user = get_user(callback.from_user.id)
+    order = get_order(order_id)
+    freelancer = get_user(freelancer_id)
+    lang = user['language']
+    
+    if not order or order['client_id'] != callback.from_user.id:
+        await callback.answer(get_text("error_not_your_order", lang))
+        return
+    
+    # Update order
+    update_order(order_id, {
+        'status': 'payment_pending',
+        'selected_freelancer': freelancer_id
+    })
+    
+    commission, total_amount = calculate_commission(order['budget'])
+    
+    # Detailed admin notification with all user data
+    admin_text = f"""
+💰 <b>Новый запрос на подтверждение оплаты</b>
+
+📋 <b>Заказ #{order_id}:</b> {escape_html(order['title'])}
+📝 <b>Описание:</b> {escape_html(order['description'])}
+💰 <b>Сумма заказа:</b> {order['budget']} TMT
+💸 <b>Комиссия (5%):</b> {commission:.2f} TMT
+💳 <b>К получению с клиента:</b> {total_amount:.2f} TMT
+
+<b>👤 ДАННЫЕ ЗАКАЗЧИКА:</b>
+• <b>Имя:</b> {escape_html(user['first_name'])}
+• <b>Username:</b> @{user.get('username', 'не указан')}
+• <b>ID:</b> {user['id']}
+• <b>Навыки:</b> {escape_html(user.get('profile', {}).get('skills', 'Не указаны'))}
+• <b>Описание:</b> {escape_html(user.get('profile', {}).get('description', 'Не указано'))}
+• <b>Контакт:</b> {escape_html(user.get('profile', {}).get('contact', 'Не указан'))}
+
+<b>👨‍💻 ДАННЫЕ ФРИЛАНСЕРА:</b>
+• <b>Имя:</b> {escape_html(freelancer['first_name'])}
+• <b>Username:</b> @{freelancer.get('username', 'не указан')}
+• <b>ID:</b> {freelancer['id']}
+• <b>Навыки:</b> {escape_html(freelancer.get('profile', {}).get('skills', 'Не указаны'))}
+• <b>Описание:</b> {escape_html(freelancer.get('profile', {}).get('description', 'Не указано'))}
+• <b>Контакт:</b> {escape_html(freelancer.get('profile', {}).get('contact', 'Не указан'))}
+• <b>Рейтинг:</b> {get_user_average_rating(freelancer['id']):.1f}/5.0
+
+⚠️ <b>После подтверждения деньги считаются заблокированными, фрилансер может начинать работу.</b>
+"""
+    
+    admin_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="✅ Подтвердить оплату", callback_data=f"admin_confirm_{order_id}")]
+    ])
+    
+    for admin_id in ADMIN_IDS:
+        await callback.bot.send_message(admin_id, admin_text, parse_mode="HTML", reply_markup=admin_keyboard)
+    
+    # Notify client that payment request was sent
+    payment_text = f"""
+💰 <b>{"Запрос на оплату отправлен администратору" if lang == "ru" else "Töleg sorawy administratora iberildi"}</b>
+
+📋 <b>{"Заказ" if lang == "ru" else "Sargyt"}:</b> {escape_html(order['title'])}
+💰 <b>{"Сумма" if lang == "ru" else "Mukdar"}:</b> {order['budget']} TMT
+💸 <b>{"Комиссия" if lang == "ru" else "Komissiýa"}:</b> {commission:.2f} TMT
+💳 <b>{"Итого к оплате" if lang == "ru" else "Jemi töleg"}:</b> {total_amount:.2f} TMT
+
+⏳ {"Ожидайте подтверждения от администратора" if lang == "ru" else "Administratoryň tassyklamagyna garaşyň"}
+"""
+    
+    await callback.message.edit_text(payment_text, parse_mode="HTML")
+    await callback.answer()
+
+@router.callback_query(F.data.startswith("admin_confirm_"))
+async def admin_confirm_payment(callback: CallbackQuery):
+    """Admin confirms payment - money is blocked, freelancer can start work"""
+    order_id = int(callback.data.split("_")[2])
+    order = get_order(order_id)
+    
+    if not order:
+        await callback.answer("❌ Заказ не найден")
+        return
+    
+    # Update order status to in_progress and add confirmation flags
+    update_order(order_id, {
+        'status': 'in_progress',
+        'client_confirmed': False,
+        'freelancer_confirmed': False
+    })
+    
+    client = get_user(order['client_id'])
+    freelancer = get_user(order['selected_freelancer'])
+    
+    # Notify client that payment is confirmed
+    if client:
+        client_lang = client['language']
+        client_text = f"""
+✅ <b>{"Оплата подтверждена администратором!" if client_lang == "ru" else "Töleg administrator tarapyndan tassyklandy!"}</b>
+
+📋 <b>{"Заказ" if client_lang == "ru" else "Sargyt"} #{order['id']}:</b> {escape_html(order['title'])}
+👤 <b>{"Фрилансер" if client_lang == "ru" else "Frilanser"}:</b> {escape_html(freelancer['first_name'])}
+💰 <b>{"Сумма" if client_lang == "ru" else "Mukdar"}:</b> {order['budget']} TMT
+
+🔄 {"Фрилансер начинает работу. После завершения работы оба участника должны подтвердить выполнение заказа." if client_lang == "ru" else "Frilanser işe başlaýar. Iş tamamlanandan soň iki tarap hem sargydyň ýerine ýetirilmegini tassyklamaly."}
+"""
+        
+        completion_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="✅ Подтвердить завершение" if client_lang == "ru" else "✅ Tamamlamagy tassyklamak",
+                callback_data=f"confirm_completion_{order_id}"
+            )]
+        ])
+        
+        await callback.bot.send_message(
+            order['client_id'], 
+            client_text,
+            parse_mode="HTML",
+            reply_markup=completion_keyboard
+        )
+    
+    # Notify freelancer that payment is confirmed and they can start work
+    if freelancer:
+        freelancer_lang = freelancer['language']
+        freelancer_text = f"""
+✅ <b>{"Оплата подтверждена! Можете начинать работу." if freelancer_lang == "ru" else "Töleg tassyklandy! Işe başlap bolýar."}</b>
+
+📋 <b>{"Заказ" if freelancer_lang == "ru" else "Sargyt"} #{order['id']}:</b> {escape_html(order['title'])}
+👤 <b>{"Заказчик" if freelancer_lang == "ru" else "Müşderi"}:</b> {escape_html(client['first_name'])}
+💰 <b>{"Сумма" if freelancer_lang == "ru" else "Mukdar"}:</b> {order['budget']} TMT
+
+🎯 {"После завершения работы нажмите кнопку для подтверждения. Деньги будут переведены после подтверждения обеих сторон." if freelancer_lang == "ru" else "Işi gutarandan soň tassyklamak üçin düwmä basyň. Pul iki tarapyň tassyklamagyndan soň geçiriler."}
+"""
+        
+        completion_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="✅ Работа завершена" if freelancer_lang == "ru" else "✅ Iş tamamlandy",
+                callback_data=f"confirm_completion_{order_id}"
+            )]
+        ])
+        
+        await callback.bot.send_message(
+            order['selected_freelancer'], 
+            freelancer_text,
+            parse_mode="HTML",
+            reply_markup=completion_keyboard
+        )
+    
+    # Update admin message
+    await callback.message.edit_text(
+        f"✅ Оплата по заказу #{order_id} подтверждена! Фрилансер может начинать работу.\n\n{callback.message.text}",
+        parse_mode="HTML"
+    )
+    await callback.answer("✅ Оплата подтверждена")
+
+@router.callback_query(F.data.startswith("confirm_completion_"))
+async def confirm_completion(callback: CallbackQuery):
+    """Handle completion confirmation from client or freelancer"""
+    order_id = int(callback.data.split("_")[2])
+    order = get_order(order_id)
+    user = get_user(callback.from_user.id)
+    
+    if not order or not user:
+        await callback.answer("❌ Ошибка")
+        return
+    
+    lang = user['language']
+    
+    # Check if user is part of this order
+    if callback.from_user.id not in [order['client_id'], order.get('selected_freelancer')]:
+        await callback.answer(get_text("error_not_your_order", lang))
+        return
+    
+    # Determine who confirmed
+    is_client = callback.from_user.id == order['client_id']
+    is_freelancer = callback.from_user.id == order.get('selected_freelancer')
+    
+    # Update confirmation status
+    if is_client:
+        update_order(order_id, {'client_confirmed': True})
+        order['client_confirmed'] = True
+    elif is_freelancer:
+        update_order(order_id, {'freelancer_confirmed': True})
+        order['freelancer_confirmed'] = True
+    
+    # Check if both confirmed
+    if order.get('client_confirmed') and order.get('freelancer_confirmed'):
+        # Both confirmed - send to admin for payment release
+        update_order(order_id, {'status': 'completion_pending'})
+        
+        client = get_user(order['client_id'])
+        freelancer = get_user(order['selected_freelancer'])
+        
+        admin_text = f"""
+💸 <b>Запрос на выплату фрилансеру</b>
+
+📋 <b>Заказ #{order_id}:</b> {escape_html(order['title'])}
+📝 <b>Описание:</b> {escape_html(order['description'])}
+💰 <b>Сумма к выплате:</b> {order['budget']} TMT
+
+<b>✅ ОБЕ СТОРОНЫ ПОДТВЕРДИЛИ ЗАВЕРШЕНИЕ РАБОТЫ</b>
+
+👤 <b>Заказчик:</b> {escape_html(client['first_name'])} (@{client.get('username', 'нет')})
+👤 <b>Фрилансер:</b> {escape_html(freelancer['first_name'])} (@{freelancer.get('username', 'нет')})
+
+💳 <b>Переведите {order['budget']} TMT фрилансеру и нажмите кнопку после перевода.</b>
+"""
+        
+        admin_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="💸 Выплачено фрилансеру", callback_data=f"admin_release_{order_id}")]
+        ])
+        
+        for admin_id in ADMIN_IDS:
+            await callback.bot.send_message(admin_id, admin_text, parse_mode="HTML", reply_markup=admin_keyboard)
+        
+        # Notify both parties that both confirmed and waiting for admin payout
+        completion_text_ru = f"""
+✅ <b>Обе стороны подтвердили завершение заказа!</b>
+
+📋 <b>Заказ #{order_id}:</b> {escape_html(order['title'])}
+💰 <b>Сумма:</b> {order['budget']} TMT
+
+⏳ Ожидается выплата от администратора фрилансеру.
+"""
+        
+        completion_text_tm = f"""
+✅ <b>Iki tarap hem sargydyň tamamlanmagyny tassyklady!</b>
+
+📋 <b>Sargyt #{order_id}:</b> {escape_html(order['title'])}
+💰 <b>Mukdar:</b> {order['budget']} TMT
+
+⏳ Administratoryň frilanser tölemegine garaşýarys.
+"""
+        
+        if client:
+            await callback.bot.send_message(
+                order['client_id'],
+                completion_text_ru if client['language'] == 'ru' else completion_text_tm,
+                parse_mode="HTML"
+            )
+        
+        if freelancer:
+            await callback.bot.send_message(
+                order['selected_freelancer'],
+                completion_text_ru if freelancer['language'] == 'ru' else completion_text_tm,
+                parse_mode="HTML"
+            )
+        
+        await callback.answer("✅ Обе стороны подтвердили. Ожидается выплата." if lang == "ru" else "✅ Iki tarap tassyklady. Tölemek garaşylýar.")
+    else:
+        # Only one side confirmed
+        confirmation_status = ""
+        if order.get('client_confirmed'):
+            confirmation_status = "✅ Заказчик подтвердил" if lang == "ru" else "✅ Müşderi tassyklady"
+        if order.get('freelancer_confirmed'):
+            if confirmation_status:
+                confirmation_status += "\n"
+            confirmation_status += "✅ Фрилансер подтвердил" if lang == "ru" else "✅ Frilanser tassyklady"
+        
+        status_text = f"""
+⏳ <b>{"Ожидается подтверждение от обеих сторон" if lang == "ru" else "Iki tarapyň tassyklamagyna garaşylýar"}</b>
+
+{confirmation_status}
+"""
+        
+        await callback.message.edit_text(status_text, parse_mode="HTML")
+        await callback.answer("✅ Ваше подтверждение принято" if lang == "ru" else "✅ Siziň tassyklamaňyz kabul edildi")
+
+@router.callback_query(F.data.startswith("admin_release_"))
+async def admin_release_payment(callback: CallbackQuery):
+    """Admin releases payment to freelancer"""
+    order_id = int(callback.data.split("_")[2])
+    order = get_order(order_id)
+    
+    if not order:
+        await callback.answer("❌ Заказ не найден")
+        return
+    
+    # Update order status to completed
+    update_order(order_id, {'status': 'completed', 'completed_at': datetime.now().isoformat()})
+    
+    client = get_user(order['client_id'])
+    freelancer = get_user(order['selected_freelancer'])
+    
+    # Notify client that order is completed and payment was released
+    if client:
+        client_lang = client['language']
+        client_completion_text = f"""
+🎉 <b>{"Заказ успешно завершен!" if client_lang == "ru" else "Sargyt üstünlikli tamamlandy!"}</b>
+
+📋 <b>{"Заказ" if client_lang == "ru" else "Sargyt"} #{order_id}:</b> {escape_html(order['title'])}
+👤 <b>{"Фрилансер" if client_lang == "ru" else "Frilanser"}:</b> {escape_html(freelancer['first_name'])}
+💰 <b>{"Сумма" if client_lang == "ru" else "Mukdar"}:</b> {order['budget']} TMT
+
+💸 {"Оплата переведена фрилансеру. Спасибо за использование нашей платформы!" if client_lang == "ru" else "Töleg frilanser geçirildi. Platformamyzy ulananyňyz üçin sag boluň!"}
+
+{"Можете оставить отзыв о работе фрилансера:" if client_lang == "ru" else "Frilanser barada teswir galdyryp bilersiňiz:"}
+"""
+        
+        review_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="⭐ Оставить отзыв" if client_lang == "ru" else "⭐ Teswir galdyrmak",
+                callback_data=f"review_{order_id}_{freelancer['id']}_{client['id']}"
+            )]
+        ])
+        
+        await callback.bot.send_message(
+            order['client_id'],
+            client_completion_text,
+            parse_mode="HTML",
+            reply_markup=review_keyboard
+        )
+    
+    # Notify freelancer that payment was released
+    if freelancer:
+        freelancer_lang = freelancer['language']
+        freelancer_completion_text = f"""
+💰 <b>{"Оплата получена! Заказ завершен." if freelancer_lang == "ru" else "Töleg alyndy! Sargyt tamamlandy."}</b>
+
+📋 <b>{"Заказ" if freelancer_lang == "ru" else "Sargyt"} #{order_id}:</b> {escape_html(order['title'])}
+👤 <b>{"Заказчик" if freelancer_lang == "ru" else "Müşderi"}:</b> {escape_html(client['first_name'])}
+💰 <b>{"Получено" if freelancer_lang == "ru" else "Alyndy"}:</b> {order['budget']} TMT
+
+🎉 {"Поздравляем с успешным завершением работы!" if freelancer_lang == "ru" else "Işiň üstünlikli tamamlanmagy bilen gutlaýarys!"}
+
+{"Можете попросить заказчика оставить отзыв:" if freelancer_lang == "ru" else "Müşderiden teswir galdyrmagyny haýyş edip bilersiňiz:"}
+"""
+        
+        review_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="⭐ Оставить отзыв заказчику" if freelancer_lang == "ru" else "⭐ Müşderi barada teswir",
+                callback_data=f"review_{order_id}_{client['id']}_{freelancer['id']}"
+            )]
+        ])
+        
+        await callback.bot.send_message(
+            order['selected_freelancer'],
+            freelancer_completion_text,
+            parse_mode="HTML",
+            reply_markup=review_keyboard
+        )
+    
+    # Update admin message
+    await callback.message.edit_text(
+        f"💸 Выплата по заказу #{order_id} произведена! Заказ завершен.\n\n{callback.message.text}",
+        parse_mode="HTML"
+    )
+    await callback.answer("💸 Выплата произведена, заказ завершен")
+
+# Profile handlers
+@router.message(F.text.in_(["👤 Профиль", "👤 Profil"]))
+async def show_profile(message: Message):
+    user = get_user(message.from_user.id)
+    if not user:
+        return
+    
+    lang = user.get('language', 'ru')
+    profile_text = format_profile_text(user, lang)
+    
+    await message.answer(profile_text, reply_markup=get_profile_edit_keyboard(lang), parse_mode="HTML")
+
+@router.callback_query(F.data == "edit_name")
+async def edit_name(callback: CallbackQuery, state: FSMContext):
+    user = get_user(callback.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await callback.message.answer("Введите новое имя:" if lang == "ru" else "Täze ady giriziň:", reply_markup=get_back_keyboard(lang))
+    await state.set_state(ProfileStates.waiting_new_name)
+    await callback.answer()
+
+@router.message(ProfileStates.waiting_new_name)
+async def name_updated(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    if message.text == get_text("btn_back", lang):
+        await show_profile(message)
+        await state.clear()
+        return
+    
+    # Update user profile
+    profile = user.get('profile', {})
+    profile['name'] = message.text
+    update_user(message.from_user.id, {'profile': profile})
+    
+    await message.answer(get_text("profile_updated", lang))
+    await show_profile(message)
+    await state.clear()
+
+@router.callback_query(F.data == "edit_skills")
+async def edit_skills(callback: CallbackQuery, state: FSMContext):
+    user = get_user(callback.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await callback.message.answer("Введите новые навыки:" if lang == "ru" else "Täze başarnyklary giriziň:", reply_markup=get_back_keyboard(lang))
+    await state.set_state(ProfileStates.waiting_new_skills)
+    await callback.answer()
+
+@router.message(ProfileStates.waiting_new_skills)
+async def skills_updated(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    if message.text == get_text("btn_back", lang):
+        await show_profile(message)
+        await state.clear()
+        return
+    
+    # Update user profile
+    profile = user.get('profile', {})
+    profile['skills'] = message.text
+    update_user(message.from_user.id, {'profile': profile})
+    
+    await message.answer(get_text("profile_updated", lang))
+    await show_profile(message)
+    await state.clear()
+
+@router.callback_query(F.data == "edit_description")
+async def edit_description(callback: CallbackQuery, state: FSMContext):
+    user = get_user(callback.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await callback.message.answer("Введите новое описание:" if lang == "ru" else "Täze beýany giriziň:", reply_markup=get_back_keyboard(lang))
+    await state.set_state(ProfileStates.waiting_new_description)
+    await callback.answer()
+
+@router.message(ProfileStates.waiting_new_description)
+async def description_updated(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    if message.text == get_text("btn_back", lang):
+        await show_profile(message)
+        await state.clear()
+        return
+    
+    # Update user profile
+    profile = user.get('profile', {})
+    profile['description'] = message.text
+    update_user(message.from_user.id, {'profile': profile})
+    
+    await message.answer(get_text("profile_updated", lang))
+    await show_profile(message)
+    await state.clear()
+
+@router.callback_query(F.data == "edit_contact")
+async def edit_contact(callback: CallbackQuery, state: FSMContext):
+    user = get_user(callback.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    await callback.message.answer("Введите новый контакт:" if lang == "ru" else "Täze kontakty giriziň:", reply_markup=get_back_keyboard(lang))
+    await state.set_state(ProfileStates.waiting_new_contact)
+    await callback.answer()
+
+@router.message(ProfileStates.waiting_new_contact)
+async def contact_updated(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru')
+    
+    if message.text == get_text("btn_back", lang):
+        await show_profile(message)
+        await state.clear()
+        return
+    
+    # Update user profile
+    profile = user.get('profile', {})
+    profile['contact'] = message.text
+    update_user(message.from_user.id, {'profile': profile})
+    
+    await message.answer(get_text("profile_updated", lang))
+    await show_profile(message)
+    await state.clear()
+
+# Review handlers
+@router.message(F.text.in_(["📝 Отзывы", "📝 Synlar"]))
+async def view_reviews(message: Message):
+    user = get_user(message.from_user.id)
+    if not user:
+        return
+    
+    lang = user.get('language', 'ru')
+    reviews = get_user_reviews(message.from_user.id)
+    
+    if not reviews:
+        await message.answer(get_text("no_reviews", lang))
+        return
+    
+    await message.answer(get_text("reviews_about_you", lang))
+    
+    for review in reviews:
+        review_text = format_review_text(review, lang)
+        await message.answer(review_text, parse_mode="HTML")
+
+@router.callback_query(F.data.startswith("review_"))
+async def start_review(callback: CallbackQuery, state: FSMContext):
+    parts = callback.data.split("_")
+    order_id, reviewed_id, reviewer_id = int(parts[1]), int(parts[2]), int(parts[3])
+    
+    user = get_user(callback.from_user.id)
+    if not user or callback.from_user.id != reviewer_id:
+        await callback.answer("❌ Ошибка")
+        return
+    
+    lang = user['language']
+    
+    # Check if can leave review
+    if not can_leave_review(order_id, reviewer_id, reviewed_id):
+        await callback.answer("❌ Нельзя оставить отзыв" if lang == "ru" else "❌ Teswir galdyryp bolmaýar")
+        return
+    
+    await state.update_data(order_id=order_id, reviewed_id=reviewed_id)
+    await callback.message.edit_text(get_text("select_rating", lang), reply_markup=get_rating_keyboard(lang))
+    await state.set_state(ReviewStates.waiting_rating)
+    await callback.answer()
+
+@router.callback_query(F.data.startswith("rating_"), StateFilter(ReviewStates.waiting_rating))
+async def rating_selected(callback: CallbackQuery, state: FSMContext):
+    rating = int(callback.data.split("_")[1])
+    user = get_user(callback.from_user.id)
+    lang = user['language']
+    
+    await state.update_data(rating=rating)
+    await callback.message.edit_text(get_text("enter_review_text", lang))
+    await state.set_state(ReviewStates.waiting_review_text)
+    await callback.answer()
+
+@router.message(ReviewStates.waiting_review_text)
+async def review_text_received(message: Message, state: FSMContext):
+    data = await state.get_data()
+    user = get_user(message.from_user.id)
+    lang = user['language']
+    
+    review_data = {
+        'rating': data['rating'],
+        'text': message.text
+    }
+    
+    if add_review(data['order_id'], message.from_user.id, data['reviewed_id'], review_data):
+        await message.answer(get_text("review_added", lang))
+    else:
+        await message.answer(get_text("review_error", lang))
+    
+    await state.clear()
+
+# Admin handlers
+@router.message(F.text == "📊 Статистика")
+async def admin_stats(message: Message):
+    if not is_admin(message.from_user.id):
+        return
+    
+    stats = get_stats()
+    stats_text = f"""
+📊 <b>Статистика платформы</b>
+
+👥 <b>Пользователи:</b>
+• Всего: {stats['total_users']}
+• Фрилансеры: {stats['freelancers']}
+• Заказчики: {stats['clients']}
+
+📋 <b>Заказы:</b>
+• Всего: {stats['total_orders']}
+• Активные: {stats['active_orders']}
+• Завершенные: {stats['completed_orders']}
+
+⭐ <b>Отзывы:</b> {stats['total_reviews']}
+"""
+    
+    await message.answer(stats_text, parse_mode="HTML")
+
+@router.message(F.text == "💰 Подтвердить оплату")
+async def confirm_payment_button(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+    
+    # Get orders pending payment confirmation
+    pending_orders = [order for order in orders_db.values() if order.get('status') == 'payment_pending']
+    
+    if not pending_orders:
+        await message.answer("📭 Нет заказов ожидающих подтверждения оплаты")
+        return
+    
+    keyboard = get_admin_payment_keyboard(pending_orders, "confirm")
+    await message.answer("💰 Выберите заказ для подтверждения оплаты:", reply_markup=keyboard)
+
+@router.message(F.text == "💸 Выплатить")
+async def release_payment_button(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+    
+    # Get orders pending payment release
+    pending_orders = [order for order in orders_db.values() if order.get('status') == 'completion_pending']
+    
+    if not pending_orders:
+        await message.answer("📭 Нет заказов ожидающих выплаты")
+        return
+    
+    keyboard = get_admin_payment_keyboard(pending_orders, "release")
+    await message.answer("💸 Выберите заказ для выплаты:", reply_markup=keyboard)
+
+@router.callback_query(F.data.startswith("admin_confirm_"))
+async def admin_confirm_callback(callback: CallbackQuery):
+    if not is_admin(callback.from_user.id):
+        await callback.answer("❌ Нет доступа")
+        return
+    
+    await admin_confirm_payment(callback)
+
+@router.callback_query(F.data.startswith("admin_release_"))
+async def admin_release_callback(callback: CallbackQuery):
+    if not is_admin(callback.from_user.id):
+        await callback.answer("❌ Нет доступа")
+        return
+    
+    await admin_release_payment(callback)
+
+@router.message(F.text == "🛠 Панель администратора")
+async def admin_panel(message: Message):
+    if not is_admin(message.from_user.id):
+        return
+    
+    await message.answer("🛠 Панель администратора", reply_markup=get_admin_keyboard())
+
+@router.message(F.text == "👥 Пользователи")
+async def admin_users(message: Message):
+    if not is_admin(message.from_user.id):
+        return
+    
+    stats = get_stats()
+    users_text = f"""
+👥 <b>Управление пользователями</b>
+
+📊 <b>Статистика:</b>
+• Всего пользователей: {stats['total_users']}
+• Фрилансеры: {stats['freelancers']}
+• Заказчики: {stats['clients']}
+
+📝 <b>Последние регистрации:</b>
+"""
+    
+    # Show recent users
+    recent_users = sorted(users_db.values(), key=lambda x: x.get('created_at', ''), reverse=True)[:5]
+    for user in recent_users:
+        created_date = datetime.fromisoformat(user['created_at']).strftime("%d.%m.%Y")
+        role = "Фрилансер" if user.get('role') == 'freelancer' else "Заказчик"
+        users_text += f"\n• {escape_html(user['first_name'])} ({role}) - {created_date}"
+    
+    await message.answer(users_text, parse_mode="HTML")
+
+@router.message(F.text == "📋 Заказы")
+async def admin_orders(message: Message):
+    if not is_admin(message.from_user.id):
+        return
+    
+    stats = get_stats()
+    orders_text = f"""
+📋 <b>Управление заказами</b>
+
+📊 <b>Статистика:</b>
+• Всего заказов: {stats['total_orders']}
+• Активные: {stats['active_orders']}
+• Завершенные: {stats['completed_orders']}
+
+📝 <b>Последние заказы:</b>
+"""
+    
+    # Show recent orders
+    recent_orders = sorted(orders_db.values(), key=lambda x: x.get('created_at', ''), reverse=True)[:5]
+    for order in recent_orders:
+        created_date = datetime.fromisoformat(order['created_at']).strftime("%d.%m.%Y")
+        status_emoji = get_status_emoji(order.get('status', 'active'))
+        orders_text += f"\n• {status_emoji} #{order['id']} {escape_html(truncate_text(order['title'], 30))} - {created_date}"
+    
+    await message.answer(orders_text, parse_mode="HTML")
+
+@router.message(F.text.in_(["📢 Рассылка"]))
+async def admin_broadcast_start(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+    
+    await message.answer("📢 Введите сообщение для рассылки:", reply_markup=get_back_keyboard())
+    await state.set_state(AdminStates.waiting_broadcast_message)
+
+@router.message(AdminStates.waiting_broadcast_message)
+async def admin_broadcast_send(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+    
+    if message.text == "◀️ Назад":
+        await admin_panel(message)
+        await state.clear()
+        return
+    
+    # Send message to all users
+    success_count = 0
+    for user_id in users_db.keys():
+        try:
+            await message.bot.send_message(int(user_id), message.text)
+            success_count += 1
+        except Exception:
+            pass
+    
+    await message.answer(f"✅ Сообщение отправлено {success_count} пользователям")
+    await state.clear()
+
+@router.message(F.text == "◀️ Назад")
+async def admin_back_to_menu(message: Message, state: FSMContext):
+    await state.clear()
+    
+    if is_admin(message.from_user.id):
+        user = get_user(message.from_user.id)
+        if user:
+            role = user.get('role')
+            lang = user.get('language', 'ru')
+            await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang))
+        return
+    
+    user = get_user(message.from_user.id)
+    if user:
+        role = user.get('role')
+        lang = user.get('language', 'ru')
+        await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang))
+
+# General back button handler
+@router.message(F.text.in_(["◀️ Назад", "◀️ Yza"]))
+async def back_button(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    if not user:
+        return
+    
+    await state.clear()
+    
+    role = user.get('role')
+    lang = user.get('language', 'ru')
+    
+    await message.answer(get_text(f"main_menu_{role}", lang), reply_markup=get_main_menu_keyboard(role, lang))
+
+# Role change handler
+@router.message(F.text.in_(["🔄 Сменить роль", "🔄 Roly üýtgetmek"]))
+async def change_role(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    if not user:
+        await cmd_start(message, state)
+        return
+    
+    lang = user.get('language', 'ru')
+    
+    await message.answer(
+        get_text("choose_role", lang),
+        reply_markup=get_role_keyboard(lang)
+    )
+    await state.set_state(RegistrationStates.waiting_role)
+
+# Help handler
+@router.message(F.text.in_(["❓ Помощь", "❓ Kömek"]))
+async def help_command(message: Message):
+    user = get_user(message.from_user.id)
+    lang = user.get('language', 'ru') if user else 'ru'
+    
+    help_text = """
+❓ <b>Помощь по использованию FreelanceTM</b>
+
+<b>Для заказчиков:</b>
+1. Создайте заказ через "➕ Создать заказ"
+2. Дождитесь откликов от фрилансеров
+3. Выберите подходящего исполнителя
+4. Оплатите заказ (деньги блокируются до завершения)
+5. После получения результата подтвердите завершение
+6. Оставьте отзыв о работе
+
+<b>Для фрилансеров:</b>
+1. Просматривайте заказы в "📋 Просмотр заказов"
+2. Откликайтесь на интересные проекты
+3. Ждите выбора от заказчика
+4. После подтверждения оплаты начинайте работу
+5. По завершении подтвердите выполнение заказа
+6. Получите оплату после подтверждения обеих сторон
+
+<b>Гарантии:</b>
+• Деньги блокируются до завершения работы
+• Комиссия платформы: 5%
+• Обязательное подтверждение от обеих сторон
+• Система отзывов и рейтингов
+
+📧 По вопросам обращайтесь:
+• Email: freelancetmbot@gmail.com
+• Админ: @FreelanceTM_admin
+""" if lang == "ru" else """
+❓ <b>FreelanceTM ulanmak boýunça kömek</b>
+
+<b>Müşderiler üçin:</b>
+1. "➕ Sargyt döretmek" arkaly sargyt dörediň
+2. Frilanserlerden jogaplara garaşyň
+3. Amatly ýerine ýetirijini saýlaň
+4. Sargydy töläň (pul tamamlanýança petiklener)
+5. Netije alandan soň tamamlamagy tassyklaň
+6. Iş barada teswir galdyryň
+
+<b>Frilanserler üçin:</b>
+1. "📋 Sargytlary görmek" -de sargytlary göriň
+2. Gyzykly taslamalara jogap beriň
+3. Müşderiniň saýlamagyna garaşyň
+4. Töleg tassyklanandan soň işe başlaň
+5. Tamamlanan soň ýerine ýetirmegi tassyklaň
+6. Iki tarapyň tassyklamasyndan soň töleg alyň
+
+<b>Kepillik:</b>
+• Pul işiň tamamlanmagyna çenli petiklener
+• Platforma komissiýasy: 5%
+• Iki tarapyň hökmany tassyklamagy
+• Teswir we reýting ulgamy
+
+📧 Soraglar üçin ýüzleniň:
+• Email: freelancetmbot@gmail.com
+• Admin: @FreelanceTM_admin
+"""
+    
+    await message.answer(help_text, parse_mode="HTML")
+
+# Fallback handler for unknown messages
+@router.message()
+async def unknown_message(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    if not user:
+        await cmd_start(message, state)
+        return
+    
+    lang = user.get('language', 'ru')
+    role = user.get('role')
+    
+    await message.answer(
+        f"❓ {'Неизвестная команда. Используйте меню.' if lang == 'ru' else 'Näbelli buýruk. Menýu ulanyň.'}",
+        reply_markup=get_main_menu_keyboard(role, lang)
+    )
+
+# =============================================================================
+# MAIN FUNCTION
+# =============================================================================
+
+# Global bot and dispatcher instances
+bot = None
+dp = None
+
+def init_bot():
+    """Initialize bot and dispatcher"""
+    global bot, dp
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Check bot token
+    if not BOT_TOKEN or BOT_TOKEN == "your_bot_token_here":
+        logger.error("BOT_TOKEN environment variable is required!")
+        return None, None
+    
+    # Initialize database
+    init_database()
+    
+    # Create bot and dispatcher
+    bot = Bot(
+        token=BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+    dp = Dispatcher()
+    
+    # Add middleware
+    dp.message.middleware(SubscriptionMiddleware())
+    dp.callback_query.middleware(SubscriptionMiddleware())
+    
+    # Register router
+    dp.include_router(router)
+    
+    logger.info("🚀 FreelanceTM Bot initialized!")
+    return bot, dp
+
+# Flask app for webhook
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "FreelanceTM бот работает!"
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    """Handle webhook updates"""
+    global bot, dp
+    
+    if not bot or not dp:
+        bot, dp = init_bot()
+        if not bot:
+            return "Bot not initialized", 500
+    
+    if request.headers.get("content-type") == "application/json":
+        try:
+            json_data = request.get_json()
+            update = Update(**json_data)
+            
+            # Create and run async task
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(dp.feed_update(bot, update))
+            loop.close()
+            
+            return "", 200
+        except Exception as e:
+            logger.error(f"Error processing update: {e}")
+            return "Error", 500
+    return "Invalid request", 403
+
+async def main():
+    """Main function for polling mode"""
+    global bot, dp
+    
+    # Start keep_alive server
+    keep_alive()
+    
+    bot, dp = init_bot()
+    if not bot:
+        return
+    
+    # Start polling
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    # Check if running in webhook mode
+    webhook_url = os.getenv("WEBHOOK_URL")
+    if webhook_url:
+        # Webhook mode
+        bot, dp = init_bot()
+        if bot:
+            # Set webhook
+            asyncio.run(bot.set_webhook(url=webhook_url))
+            logger.info(f"Webhook set to: {webhook_url}")
+        
+        # Start Flask app
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host="0.0.0.0", port=port, debug=False)
+    else:
+        # Polling mode
+        asyncio.run(main())
