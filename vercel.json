@@ -11,15 +11,5 @@
       "src": "/(.*)",
       "dest": "main.py"
     }
-  ],
-  "env": {
-    "BOT_TOKEN": "@bot_token",
-    "ADMIN_IDS": "@admin_ids",
-    "REQUIRED_CHANNEL": "@required_channel"
-  },
-  "functions": {
-    "main.py": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
