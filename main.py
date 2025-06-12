@@ -143,3 +143,8 @@ def bot_info():
     except Exception as e:
         logger.error(f"Bot info error: {e}")
         return jsonify({"error": str(e)}), 500
+@app.route('/webhook', methods=["POST"])
+def webhook():
+    update = request.get_json()
+    asyncio.run(dp.feed_update(bot=bot, update=Update.model_validate(update)))
+    return "ok"
