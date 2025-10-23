@@ -1,0 +1,72 @@
+{
+  "1": {
+    "id": 1,
+    "user_id": 7692003502,
+    "amount": 1.0,
+    "phone": "1",
+    "status": "completed",
+    "created_at": "2025-07-10T08:40:58.247985",
+    "balance_before": 1.0,
+    "completed_at": "2025-07-10T10:21:45.288190"
+  },
+  "2": {
+    "id": 2,
+    "user_id": 7692003502,
+    "amount": 100.0,
+    "phone": "993 65 69 66 99",
+    "status": "completed",
+    "created_at": "2025-07-10T10:21:19.122956",
+    "balance_before": 100.0,
+    "completed_at": "2025-07-10T10:21:26.363849"
+  },
+  "3": {
+    "id": 3,
+    "user_id": 7692003502,
+    "amount": 1.0,
+    "phone": "11",
+    "status": "completed",
+    "created_at": "2025-07-14T07:00:26.760472",
+    "balance_before": 10.0,
+    "completed_at": "2025-07-14T07:00:50.297705"
+  },
+  "4": {
+    "id": 4,
+    "user_id": 7337986286,
+    "amount": 50.0,
+    "phone": "+99371583082",
+    "status": "completed",
+    "created_at": "2025-07-14T11:08:30.457604",
+    "balance_before": 50.0,
+    "completed_at": "2025-07-14T11:08:38.962489"
+  },
+  "5": {
+    "id": 5,
+    "user_id": 7692003502,
+    "amount": 1.0,
+    "phone": "S",
+    "status": "completed",
+    "created_at": "2025-07-17T06:27:07.289666",
+    "balance_before": 9.0,
+    "completed_at": "2025-07-17T06:27:13.831058"
+  },
+  "6": {
+    "id": 6,
+    "user_id": 8078218294,
+    "type": "topup",
+    "amount": 10.0,
+    "phone": null,
+    "status": "pending",
+    "created_at": "2025-07-20T07:51:03.900140",
+    "balance_before": 0.0
+  },
+  "7": {
+    "id": 7,
+    "user_id": 8078218294,
+    "type": "topup",
+    "amount": 10.0,
+    "phone": null,
+    "status": "pending",
+    "created_at": "2025-07-20T08:14:07.036878",
+    "balance_before": 0.0
+  }
+}
