@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "freelancer_id": 7880594944,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-05T17:37:35.675683",
+      "order": {
+        "client_id": 6498798356,
+        "title": "Web developer",
+        "description": "Gerek",
+        "category": "web",
+        "budget": 100.0,
+        "deadline": 40,
+        "contact": "Skd",
+        "id": 2,
+        "created_at": "2025-07-05T17:00:14.719930",
+        "status": "active"
+      }
+    }
+  ]
+}

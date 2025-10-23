@@ -1,0 +1,1383 @@
+{
+  "5": [
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-14T11:05:25.857662",
+      "order": {
+        "client_id": 8038424520,
+        "title": "Logo ýasamak",
+        "description": "Logo ýasamaly \"F\" harply",
+        "category": "design",
+        "budget": 50.0,
+        "deadline": 1,
+        "contact": "+99361839308",
+        "id": 5,
+        "created_at": "2025-07-14T10:40:37.290811",
+        "status": "completed",
+        "selected_freelancer": 7337986286,
+        "selected_freelancer_username": "Osmanow1",
+        "selected_freelancer_name": "#Osmanow",
+        "client_confirmed": true,
+        "freelancer_confirmed": true,
+        "completed_at": "2025-07-14T11:07:14.924879"
+      }
+    }
+  ],
+  "7": [
+    {
+      "freelancer_id": 7946495043,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-16T13:33:45.335543"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-16T22:16:30.165268",
+      "order": {
+        "client_id": 8038424520,
+        "title": "Jay alyan musderi tapmaly",
+        "description": "Müşderi tapyň: jaý ýa-da kwartira satyn aljak\n\nMen ýaşaýyş jaýlaryny – kwartira we öýleri satýaryn. Satylýan jaýlaryň sany köp we olaryň her biri aýratyn aýratynlyklara eýe. Käbiri şäheriň merkezinde ýerleşýär, beýlekiler bolsa giň ýerli, täzeden gurlan ýa-da owadan görnüşli. Her müşderiniň islän görnüşi üçin bir zat bar.\n\nMaňa kömek edip biljek adam gerek – müşderi tapyp bilýän we öý ýa-da kwartira satyn almak isleýän adamlary getirjek. Sizden garaşylýan zatlar:\n\nAktiw müşderi gözlegi (internetde, sosial mediada, tanyşlaryň arasynda\n\nMeni bilen habarlaşdyrmak ýa-da müşderiniň kontaktlaryny bermek\n\n\nIslendik kömek hökmünde höwesli we ynamdar adamlara garaşýaryn.",
+        "category": "other",
+        "budget": 20.0,
+        "deadline": 10,
+        "contact": "Döwletli açar",
+        "id": 7,
+        "created_at": "2025-07-16T12:57:08.829930",
+        "status": "in_progress",
+        "selected_freelancer": 6879986052,
+        "selected_freelancer_username": "mrwolf_80",
+        "selected_freelancer_name": "MrWolf_82",
+        "client_confirmed": false,
+        "freelancer_confirmed": false
+      }
+    },
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:34:31.246509",
+      "order": {
+        "client_id": 8038424520,
+        "title": "Jay alyan musderi tapmaly",
+        "description": "Müşderi tapyň: jaý ýa-da kwartira satyn aljak\n\nMen ýaşaýyş jaýlaryny – kwartira we öýleri satýaryn. Satylýan jaýlaryň sany köp we olaryň her biri aýratyn aýratynlyklara eýe. Käbiri şäheriň merkezinde ýerleşýär, beýlekiler bolsa giň ýerli, täzeden gurlan ýa-da owadan görnüşli. Her müşderiniň islän görnüşi üçin bir zat bar.\n\nMaňa kömek edip biljek adam gerek – müşderi tapyp bilýän we öý ýa-da kwartira satyn almak isleýän adamlary getirjek. Sizden garaşylýan zatlar:\n\nAktiw müşderi gözlegi (internetde, sosial mediada, tanyşlaryň arasynda\n\nMeni bilen habarlaşdyrmak ýa-da müşderiniň kontaktlaryny bermek\n\n\nIslendik kömek hökmünde höwesli we ynamdar adamlara garaşýaryn.",
+        "category": "other",
+        "budget": 20.0,
+        "deadline": 10,
+        "contact": "Döwletli açar",
+        "id": 7,
+        "created_at": "2025-07-16T12:57:08.829930",
+        "status": "in_progress",
+        "selected_freelancer": 6879986052,
+        "selected_freelancer_username": "mrwolf_80",
+        "selected_freelancer_name": "MrWolf_82",
+        "client_confirmed": false,
+        "freelancer_confirmed": false
+      }
+    },
+    {
+      "freelancer_id": 6879986052,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:47:56.532804"
+    }
+  ],
+  "8": [
+    {
+      "freelancer_id": 7428638897,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-16T16:59:45.670477",
+      "order": {
+        "client_id": 8038424520,
+        "title": "Нужно найти клиента для покупки дома, квартиры",
+        "description": "Я продаю не движемость, их очень много, все особенныу по своему",
+        "category": "other",
+        "budget": 20.0,
+        "deadline": 10,
+        "contact": "Döwletli açar",
+        "id": 8,
+        "created_at": "2025-07-16T12:58:56.483503",
+        "status": "in_progress",
+        "selected_freelancer": 7428638897,
+        "selected_freelancer_username": "allanurw",
+        "selected_freelancer_name": "Allanur",
+        "client_confirmed": false,
+        "freelancer_confirmed": true
+      }
+    }
+  ],
+  "9": [
+    {
+      "freelancer_id": 7797526154,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:21:22.877336"
+    },
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:33:03.854408",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6879986052,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:38:38.404851"
+    },
+    {
+      "freelancer_id": 7021069843,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T06:56:43.907252"
+    },
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T07:44:38.369351"
+    },
+    {
+      "freelancer_id": 6806332666,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T09:06:45.843147"
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:31:46.710195"
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:58:33.791358"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T12:06:37.579240",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 8157570792,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T13:01:32.824947",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T13:36:51.061109",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6357597531,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:48:20.254132"
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:31.347683",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:40:12.997137"
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T05:37:38.592876",
+      "order": {
+        "client_id": 7351403604,
+        "title": "Logo",
+        "description": null,
+        "category": "other",
+        "budget": 1.0,
+        "deadline": 1,
+        "contact": "1",
+        "id": 9,
+        "created_at": "2025-07-16T22:41:47.827796",
+        "status": "active"
+      }
+    }
+  ],
+  "12": [
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T07:12:03.574936"
+    }
+  ],
+  "11": [
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T07:12:19.901496"
+    }
+  ],
+  "15": [
+    {
+      "freelancer_id": 8038424520,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:28:29.627711",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:28:51.587314"
+    },
+    {
+      "freelancer_id": 7692003502,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:29:08.830294"
+    },
+    {
+      "freelancer_id": 6645440876,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:37:31.563609",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7428638897,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:59:20.936271",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6806332666,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T09:08:20.624949"
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:31:43.941421"
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:38:06.913206"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T12:06:40.554319",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T12:16:17.371363"
+    },
+    {
+      "freelancer_id": 8157570792,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T13:00:43.966882",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T13:35:48.003878",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6357597531,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:21:01.499790"
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:26.861461",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6716675601,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:30:31.210886"
+    },
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:33:54.288459"
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T05:37:19.599607",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 5836143506,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:18:17.890525",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6712087429,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T12:09:20.996285",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6624651426,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T13:45:12.622479",
+      "order": {
+        "client_id": 7374105555,
+        "title": "F harpyndaky logolar",
+        "description": "F harpyndaky logolar",
+        "category": "mobile",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99363998067",
+        "id": 15,
+        "created_at": "2025-07-17T08:08:32.545778",
+        "status": "active"
+      }
+    }
+  ],
+  "16": [
+    {
+      "freelancer_id": 7692003502,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:29:11.141694"
+    },
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:31:32.607872"
+    },
+    {
+      "freelancer_id": 7428638897,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:59:16.551556",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:38:33.267864"
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T12:04:23.087071"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T12:06:43.243114",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:20:48.788727",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 8038424520,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T15:10:59.270201",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:24.728994",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T16:24:05.795096"
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T05:35:39.996691",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:26:09.229558"
+    },
+    {
+      "freelancer_id": 6357597531,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:30:33.995719"
+    },
+    {
+      "freelancer_id": 7258220958,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:35:40.802676",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "marketing",
+        "budget": 100.0,
+        "deadline": 7,
+        "contact": "+99363998067",
+        "id": 16,
+        "created_at": "2025-07-17T08:09:39.351202",
+        "status": "active"
+      }
+    }
+  ],
+  "17": [
+    {
+      "freelancer_id": 7692003502,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:29:12.646937"
+    },
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:31:31.296142"
+    },
+    {
+      "freelancer_id": 6483620906,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:42:24.103723",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7428638897,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:59:12.303186",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:29:23.731767"
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:58:22.955640"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T12:06:45.212041",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T13:44:42.445357",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6357597531,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:38:19.896961"
+    },
+    {
+      "freelancer_id": 8038424520,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T15:10:58.132936",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:22.518517",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:33:15.577149"
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:16:57.855964",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:25:22.507029"
+    },
+    {
+      "freelancer_id": 5836143506,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:26:16.378799",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7023819671,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T13:19:58.756519",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6923620066,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T13:23:23.127402"
+    },
+    {
+      "freelancer_id": 6624651426,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T13:41:25.391338",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7541262854,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T15:15:42.574786",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Masyn hakyndaky logo",
+        "description": "Masyn hakyndaky logo",
+        "category": "other",
+        "budget": 200.0,
+        "deadline": 10,
+        "contact": "+99363998067",
+        "id": 17,
+        "created_at": "2025-07-17T08:10:49.198125",
+        "status": "active"
+      }
+    }
+  ],
+  "18": [
+    {
+      "freelancer_id": 7692003502,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:29:14.392868"
+    },
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:31:29.423747"
+    },
+    {
+      "freelancer_id": 7911007058,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:42:40.937926"
+    },
+    {
+      "freelancer_id": 6483620906,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:42:41.540148",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7428638897,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T08:59:04.087863",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6806332666,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T09:07:33.344015"
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:58:41.076409"
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T12:04:30.262784"
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T12:06:47.905334",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:20:53.366604",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 8038424520,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T15:10:56.472128",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:20.603614",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:45:41.380379"
+    },
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:54:05.719643"
+    },
+    {
+      "freelancer_id": 5836143506,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:26:53.588951",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7023819671,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T13:19:15.207988",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7541262854,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T15:08:06.202697",
+      "order": {
+        "client_id": 7374105555,
+        "title": "Gowy logo",
+        "description": "Gowy logo",
+        "category": "mobile",
+        "budget": 50.0,
+        "deadline": 2,
+        "contact": "+99363998067",
+        "id": 18,
+        "created_at": "2025-07-17T08:22:01.641070",
+        "status": "active"
+      }
+    }
+  ],
+  "20": [
+    {
+      "freelancer_id": 7900654961,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T08:41:36.852647"
+    },
+    {
+      "freelancer_id": 6806332666,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-17T09:07:39.312971"
+    },
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T09:38:14.642675",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7501878703,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T11:40:29.525487"
+    },
+    {
+      "freelancer_id": 7656456631,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T12:04:31.519110"
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T14:21:00.670591",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:20:17.789382",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T05:37:27.994736",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 5836143506,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:26:58.385694",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7258220958,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T07:36:03.894139",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7541262854,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T14:54:02.808030",
+      "order": {
+        "client_id": 7911007058,
+        "title": "Vpn",
+        "description": "İşleyan VPS 3gun garantiya / 50 tmt",
+        "category": "web",
+        "budget": 50.0,
+        "deadline": 999,
+        "contact": "Atabay123",
+        "id": 20,
+        "created_at": "2025-07-17T08:40:53.051930",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7683513870,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T18:41:52.822562"
+    }
+  ],
+  "19": [
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-17T15:53:52.254244"
+    }
+  ],
+  "13": [
+    {
+      "freelancer_id": 5836143506,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T06:30:10.734756"
+    }
+  ],
+  "21": [
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T11:56:48.163487",
+      "order": {
+        "client_id": 1404070598,
+        "title": "Tiktok jalob",
+        "description": "Jalob etmeli",
+        "category": "mobile",
+        "budget": 2.0,
+        "deadline": 1,
+        "contact": "862936253",
+        "id": 21,
+        "created_at": "2025-07-18T09:14:20.343571",
+        "status": "payment_pending",
+        "selected_freelancer": 7374105555,
+        "selected_freelancer_username": "Pullydadr",
+        "selected_freelancer_name": "Boss"
+      }
+    },
+    {
+      "freelancer_id": 8126706156,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T11:59:16.754165",
+      "order": {
+        "client_id": 1404070598,
+        "title": "Tiktok jalob",
+        "description": "Jalob etmeli",
+        "category": "mobile",
+        "budget": 2.0,
+        "deadline": 1,
+        "contact": "862936253",
+        "id": 21,
+        "created_at": "2025-07-18T09:14:20.343571",
+        "status": "payment_pending",
+        "selected_freelancer": 7374105555,
+        "selected_freelancer_username": "Pullydadr",
+        "selected_freelancer_name": "Boss"
+      }
+    },
+    {
+      "freelancer_id": 7258220958,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T12:02:02.480510"
+    }
+  ],
+  "22": [
+    {
+      "freelancer_id": 7541262854,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T14:52:18.313788",
+      "order": {
+        "client_id": 6712087429,
+        "title": "Logo",
+        "description": "Logo yasamak",
+        "category": "design",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99362486232",
+        "id": 22,
+        "created_at": "2025-07-18T12:16:12.359390",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 6778720110,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T16:16:43.917234",
+      "order": {
+        "client_id": 6712087429,
+        "title": "Logo",
+        "description": "Logo yasamak",
+        "category": "design",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99362486232",
+        "id": 22,
+        "created_at": "2025-07-18T12:16:12.359390",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7374105555,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T16:30:16.203641",
+      "order": {
+        "client_id": 6712087429,
+        "title": "Logo",
+        "description": "Logo yasamak",
+        "category": "design",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99362486232",
+        "id": 22,
+        "created_at": "2025-07-18T12:16:12.359390",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7301392019,
+      "message": "Готов выполнить заказ!",
+      "created_at": "2025-07-18T17:10:07.353770",
+      "order": {
+        "client_id": 6712087429,
+        "title": "Logo",
+        "description": "Logo yasamak",
+        "category": "design",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99362486232",
+        "id": 22,
+        "created_at": "2025-07-18T12:16:12.359390",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7337986286,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-18T20:32:55.456958",
+      "order": {
+        "client_id": 6712087429,
+        "title": "Logo",
+        "description": "Logo yasamak",
+        "category": "design",
+        "budget": 100.0,
+        "deadline": 1,
+        "contact": "+99362486232",
+        "id": 22,
+        "created_at": "2025-07-18T12:16:12.359390",
+        "status": "active"
+      }
+    },
+    {
+      "freelancer_id": 7644570802,
+      "message": "Sargyt ýerine ýetirmäge taýyn!",
+      "created_at": "2025-07-19T06:26:33.324097"
+    }
+  ]
+}

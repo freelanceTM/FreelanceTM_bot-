@@ -1,0 +1,156 @@
+{
+  "7692003502": {
+    "first_name": "FreelanceTM",
+    "username": "FreelanceTM_admin",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "/admin",
+      "skills": "ADMIN_ID",
+      "description": "Admin",
+      "contact": "Admin"
+    },
+    "id": 7692003502,
+    "created_at": "2025-07-03T06:54:48.352469"
+  },
+  "8038424520": {
+    "first_name": "︎ ︎︎︎ ︎ ︎",
+    "username": "paradeew1ch",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "Admin",
+      "skills": "Admin",
+      "description": "Admin",
+      "contact": "Admin"
+    },
+    "id": 8038424520,
+    "created_at": "2025-07-03T06:31:28.326901"
+  },
+  "7930106173": {
+    "first_name": "...",
+    "username": "golddd12",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Şamil",
+      "skills": "Komyuter Excel, word, photoshop, türk dili, Rus dili, Azerbaycan Dili, hasap hesip",
+      "description": "Men 22 yaşymda",
+      "contact": "62255087"
+    },
+    "id": 7930106173,
+    "created_at": "2025-07-05T05:49:32.358051"
+  },
+  "5607436685": {
+    "first_name": "Aziz",
+    "username": "az1zz_14",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Aziz",
+      "skills": "Logo design, logo animasiya",
+      "description": "Logo design we animasya edip bilyan",
+      "contact": "+99361693840"
+    },
+    "id": 5607436685,
+    "created_at": "2025-07-05T07:11:23.814065"
+  },
+  "7337986286": {
+    "first_name": "#Osmanow",
+    "username": "Osmanow1",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Osmanow",
+      "skills": "Logo dizaýner",
+      "description": "..",
+      "contact": "+99371583082"
+    },
+    "id": 7337986286,
+    "created_at": "2025-07-05T07:19:14.471557"
+  },
+  "5919978024": {
+    "first_name": "Guu",
+    "username": "Kuporri",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Avor",
+      "skills": "Python",
+      "description": "Taze basladym",
+      "contact": "J"
+    },
+    "id": 5919978024,
+    "created_at": "2025-07-05T08:13:52.944491"
+  },
+  "6498798356": {
+    "first_name": "Halal service",
+    "username": "theone_service",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Ismail_usa",
+      "skills": "Web developer Full stack\nNetwork worker \nVpn satyjy",
+      "description": "I'm a Full stack developer I have 2 years experience",
+      "contact": "+99364614588\n@ismailusa"
+    },
+    "id": 6498798356,
+    "created_at": "2025-07-05T16:54:06.671478"
+  },
+  "7410713021": {
+    "first_name": "🥇Mogamed👑",
+    "username": null,
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Mogamed",
+      "skills": "Aydym aytmak",
+      "description": "Meniñ kellam yerinde dal",
+      "contact": "+99361616161"
+    },
+    "id": 7410713021,
+    "created_at": "2025-07-05T17:09:32.781691"
+  },
+  "7902200435": {
+    "first_name": "Yhlas",
+    "username": "Yhlas006",
+    "language": "ru",
+    "role": "client",
+    "profile": {
+      "name": "Yhlas",
+      "skills": "ИИ фото редактор и сделаю реклама для вашего бизнеса \nСделаю презентацию любому темы",
+      "description": "Работаю в телеграмме",
+      "contact": "+375259578074"
+    },
+    "id": 7902200435,
+    "created_at": "2025-07-05T17:11:41.713713"
+  },
+  "6484459221": {
+    "first_name": "M88",
+    "username": null,
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Meylis",
+      "skills": "Dusunmedim",
+      "description": "Adym meylis yylym 2009",
+      "contact": "64701012"
+    },
+    "id": 6484459221,
+    "created_at": "2025-07-05T17:15:40.600973"
+  },
+  "7880594944": {
+    "first_name": "DARK TRADER 📈",
+    "username": "Darkk_trader",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "DARK TRADER",
+      "skills": null,
+      "description": "Trade edip bilyan",
+      "contact": "+99371166253"
+    },
+    "id": 7880594944,
+    "created_at": "2025-07-05T17:36:16.106552"
+  }
+}
