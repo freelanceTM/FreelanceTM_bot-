@@ -1,0 +1,32 @@
+{
+  "5": {
+    "client_id": 8038424520,
+    "title": "Logo ýasamak",
+    "description": "Logo ýasamaly \"F\" harply",
+    "category": "design",
+    "budget": 50.0,
+    "deadline": 1,
+    "contact": "+99361839308",
+    "id": 5,
+    "created_at": "2025-07-14T10:40:37.290811",
+    "status": "completed",
+    "selected_freelancer": 7337986286,
+    "selected_freelancer_username": "Osmanow1",
+    "selected_freelancer_name": "#Osmanow",
+    "client_confirmed": true,
+    "freelancer_confirmed": true,
+    "completed_at": "2025-07-14T11:07:14.924879"
+  },
+  "6": {
+    "client_id": 8038424520,
+    "title": "Prezentasiya etmek",
+    "description": "Turkmenistan barada prezentasiya ýasamaly 9 slayd",
+    "category": "writing",
+    "budget": 20.0,
+    "deadline": 1,
+    "contact": "1",
+    "id": 6,
+    "created_at": "2025-07-14T11:00:20.333147",
+    "status": "active"
+  }
+}

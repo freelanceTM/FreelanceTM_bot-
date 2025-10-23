@@ -1,0 +1,452 @@
+{
+  "7692003502": {
+    "first_name": "FreelanceTM",
+    "username": "FreelanceTM_admin",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "/admin",
+      "skills": "ADMIN_ID",
+      "description": "Admin",
+      "contact": "Admin"
+    },
+    "id": 7692003502,
+    "created_at": "2025-07-03T06:54:48.352469",
+    "balance": 9.0
+  },
+  "8038424520": {
+    "first_name": "︎ ︎︎︎ ︎ ︎",
+    "username": "paradeew1ch",
+    "language": "ru",
+    "role": "client",
+    "profile": {
+      "name": "Admin",
+      "skills": "Admin",
+      "description": "Admin",
+      "contact": "Admin"
+    },
+    "id": 8038424520,
+    "created_at": "2025-07-03T06:31:28.326901",
+    "balance": 0.0
+  },
+  "7930106173": {
+    "first_name": "...",
+    "username": "golddd12",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Şamil",
+      "skills": "Komyuter Excel, word, photoshop, türk dili, Rus dili, Azerbaycan Dili, hasap hesip",
+      "description": "Men 22 yaşymda",
+      "contact": "62255087"
+    },
+    "id": 7930106173,
+    "created_at": "2025-07-05T05:49:32.358051",
+    "balance": 0.0
+  },
+  "5607436685": {
+    "first_name": "Aziz",
+    "username": "az1zz_14",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Aziz",
+      "skills": "Logo design, logo animasiya",
+      "description": "Logo design we animasya edip bilyan",
+      "contact": "+99361693840"
+    },
+    "id": 5607436685,
+    "created_at": "2025-07-05T07:11:23.814065",
+    "balance": 0.0
+  },
+  "7337986286": {
+    "first_name": "#Osmanow",
+    "username": "Osmanow1",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Osmanow",
+      "skills": "Logo dizaýner",
+      "description": "..",
+      "contact": "+99371583082"
+    },
+    "id": 7337986286,
+    "created_at": "2025-07-05T07:19:14.471557",
+    "balance": 0.0
+  },
+  "5919978024": {
+    "first_name": "Guu",
+    "username": "Kuporri",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Avor",
+      "skills": "Python",
+      "description": "Taze basladym",
+      "contact": "J"
+    },
+    "id": 5919978024,
+    "created_at": "2025-07-05T08:13:52.944491",
+    "balance": 0.0
+  },
+  "6498798356": {
+    "first_name": "Halal service",
+    "username": "theone_service",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Ismail_usa",
+      "skills": "Web developer Full stack\nNetwork worker \nVpn satyjy",
+      "description": "I'm a Full stack developer I have 2 years experience",
+      "contact": "+99364614588\n@ismailusa"
+    },
+    "id": 6498798356,
+    "created_at": "2025-07-05T16:54:06.671478",
+    "balance": 0.0
+  },
+  "7410713021": {
+    "first_name": "🥇Mogamed👑",
+    "username": null,
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Mogamed",
+      "skills": "Aydym aytmak",
+      "description": "Meniñ kellam yerinde dal",
+      "contact": "+99361616161"
+    },
+    "id": 7410713021,
+    "created_at": "2025-07-05T17:09:32.781691",
+    "balance": 0.0
+  },
+  "7902200435": {
+    "first_name": "Yhlas",
+    "username": "Yhlas006",
+    "language": "ru",
+    "role": "client",
+    "profile": {
+      "name": "Yhlas",
+      "skills": "ИИ фото редактор и сделаю реклама для вашего бизнеса \nСделаю презентацию любому темы",
+      "description": "Работаю в телеграмме",
+      "contact": "+375259578074"
+    },
+    "id": 7902200435,
+    "created_at": "2025-07-05T17:11:41.713713",
+    "balance": 0.0
+  },
+  "6484459221": {
+    "first_name": "M88",
+    "username": null,
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Meylis",
+      "skills": "Dusunmedim",
+      "description": "Adym meylis yylym 2009",
+      "contact": "64701012"
+    },
+    "id": 6484459221,
+    "created_at": "2025-07-05T17:15:40.600973",
+    "balance": 0.0
+  },
+  "7880594944": {
+    "first_name": "DARK TRADER 📈",
+    "username": "Darkk_trader",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "DARK TRADER",
+      "skills": null,
+      "description": "Trade edip bilyan",
+      "contact": "+99371166253"
+    },
+    "id": 7880594944,
+    "created_at": "2025-07-05T17:36:16.106552",
+    "balance": 0.0
+  },
+  "7688215390": {
+    "first_name": "𝙃𝘼𝙉 𝙑𝙋𝙉𝙎",
+    "username": "han_vpns",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "han",
+      "skills": "VPN",
+      "description": "Biri",
+      "contact": "birlsi"
+    },
+    "id": 7688215390,
+    "created_at": "2025-07-10T09:39:26.576889",
+    "balance": 0.0
+  },
+  "5537197882": {
+    "first_name": ".",
+    "username": "shara_7272",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "GAFUR",
+      "skills": "Kompyuter",
+      "description": "Kompyuter hunarmeni",
+      "contact": "993 63 147272"
+    },
+    "id": 5537197882,
+    "created_at": "2025-07-10T09:42:54.603957",
+    "balance": 0.0
+  },
+  "7776834352": {
+    "first_name": "Ybraýym_777",
+    "username": "ybrayym_777",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Ybraýym",
+      "skills": "Jshd",
+      "description": "Hshd",
+      "contact": "Jehd"
+    },
+    "id": 7776834352,
+    "created_at": "2025-07-10T09:43:41.466688",
+    "balance": 0.0
+  },
+  "7301392019": {
+    "first_name": "Leon_3107",
+    "username": "leon_3107",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "Arsi",
+      "skills": "1. Создание инвестиционных сайтов\n2. Работа с PHP и SQLite\n3. Разработка Telegram-ботов\n4. Использование Telegram для уведомлений\n5. Проектирование админ-панелей\n6. Создание многоуровневых реферальных систем\n7. Работа с валютами (TMT, USDT), фиксированный курс\n8. Создание систем заданий с видео и таймерами\n9. Реализация подтверждения заявок админом\n10. Разработка интерфейсов на телефоне (без компьютера)\n11. Использование Sketchware Pro\n12. Написание художественных текстов (романы, главы, стихи)\n13. Создание HTML-энциклопедий и оффлайн-контента\n14. Проектирование лого и визуального стиля\n15. Работа с Word и PDF файлами\n16. Создание оффлайн музыкальных и видео страниц\n17. Создание чатов с отображением пользователей\n18. Создание систем уведомлений (внутренний inbox, email)\n19. Проектирование интерфейсов с разметкой (сеткой)\n20. Организация меню и навигации по сайту\n21. Перевод с английского, русского и туркменского языков\n22. Умение рисовать\n23. Написание книг на русском, английском и туркменском\n24. Написание стихотворений на русском, английском и туркменском",
+      "description": "Я — разработчик и творческий человек. Создаю сайты, Telegram-ботов, админ-панели и системы с заданиями, валютами и реферальными уровнями. Работаю даже без компьютера — через телефон. Пишу книги и стихи на русском, английском и туркменском. Перевожу между этими языками. Умею рисовать. Сочетаю логику и творчество.",
+      "contact": "@leon_3107"
+    },
+    "id": 7301392019,
+    "created_at": "2025-07-10T09:58:59.582492",
+    "balance": 0.0
+  },
+  "7226350971": {
+    "first_name": "Akmyrat",
+    "username": "Akmyrat2209",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "Akmyrat",
+      "skills": "Любые",
+      "description": "Могу все",
+      "contact": "6-09-12"
+    },
+    "id": 7226350971,
+    "created_at": "2025-07-10T10:22:41.872538",
+    "balance": 0.0
+  },
+  "8173879985": {
+    "first_name": "883",
+    "username": "bestmarkf",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "883",
+      "skills": "Любую задачу в интернете могу сделать, VPN, сайты, скрипты, зеркала, сервера, настройка и покупка под любую цель, делаю быстро, тихо, настраиваю VPN, которые не палятся, даже в странах с жёсткой цензурой, делаю сайты под любую тему, от простых лендингов до зеркал, пишу скрипты под любую задачу.",
+      "description": "Всё, что связано с интернетом, делаю. Быстро, без шума, без лишних слов. Умею решить нестандартные задачи, люблю, когда сложно.",
+      "contact": "@bestmarkf Telegram"
+    },
+    "id": 8173879985,
+    "created_at": "2025-07-10T12:14:12.798796",
+    "balance": 0.0
+  },
+  "6759273994": {
+    "first_name": "..",
+    "username": "morty_77",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "..",
+      "skills": "...",
+      "description": "....",
+      "contact": "..."
+    },
+    "id": 6759273994,
+    "created_at": "2025-07-10T12:38:44.301811",
+    "balance": 0.0
+  },
+  "7088124740": {
+    "first_name": "Jasurbek",
+    "username": null,
+    "language": "ru",
+    "role": "client",
+    "profile": {
+      "name": "+99363506371",
+      "skills": "B",
+      "description": "V",
+      "contact": "C"
+    },
+    "id": 7088124740,
+    "created_at": "2025-07-11T11:02:24.747894",
+    "balance": 0.0
+  },
+  "6541937664": {
+    "first_name": "Васечка🫠",
+    "username": "Vasyanagib",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "Kakajan",
+      "skills": "Любое",
+      "description": "Профессионал",
+      "contact": "+99361599549"
+    },
+    "id": 6541937664,
+    "created_at": "2025-07-11T11:03:44.895420",
+    "balance": 0.0
+  },
+  "7009638056": {
+    "first_name": "Шаммы (Designer)",
+    "username": "Tkm1No",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Şammy",
+      "skills": "Surat ýasaýan",
+      "description": "Surat ýasaýan",
+      "contact": "---------"
+    },
+    "id": 7009638056,
+    "created_at": "2025-07-12T07:53:47.523765",
+    "balance": 0.0
+  },
+  "7106214599": {
+    "first_name": "Sessiz_🫀🌱",
+    "username": "Sessiz_oo7",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Toyjan",
+      "skills": "Bilemok",
+      "description": "Toyjan oo7 dz",
+      "contact": "99361857096"
+    },
+    "id": 7106214599,
+    "created_at": "2025-07-12T07:57:00.078595",
+    "balance": 0.0
+  },
+  "8014834185": {
+    "first_name": "Belgi Gözleg Support",
+    "username": "BelgiGozlegAdmin",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": ".",
+      "skills": ".",
+      "description": ".",
+      "contact": "."
+    },
+    "id": 8014834185,
+    "created_at": "2025-07-12T07:57:52.533506",
+    "balance": 0.0
+  },
+  "1449828433": {
+    "first_name": "Nurik",
+    "username": "nurik_developer6",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Nuraly",
+      "skills": "Programist esasy Flutter mobil app developer",
+      "description": "Talyp 2 yyldan bari flutter bn",
+      "contact": "62298104"
+    },
+    "id": 1449828433,
+    "created_at": "2025-07-12T08:04:30.801837",
+    "balance": 0.0
+  },
+  "898003591": {
+    "first_name": "Sanny",
+    "username": "SannyMagnaco",
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "@SannyMagnaco",
+      "skills": "Перевод итальянский-русский-итальянский, английский - русский - английский",
+      "description": "Переводы и написание текстов",
+      "contact": "@SannyMagnaco"
+    },
+    "id": 898003591,
+    "created_at": "2025-07-14T07:14:17.209168",
+    "balance": 0.0
+  },
+  "6355601042": {
+    "first_name": "selina",
+    "username": null,
+    "language": "ru",
+    "role": "freelancer",
+    "profile": {
+      "name": "Selin",
+      "skills": "печатать тексты, делать переводы",
+      "description": "занимаюсь фитнесом, изучаю английский",
+      "contact": "+99364055149"
+    },
+    "id": 6355601042,
+    "created_at": "2025-07-14T09:38:48.269975",
+    "balance": 0.0
+  },
+  "5146529501": {
+    "first_name": "@Kerven",
+    "username": "Kerven_93",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Alihan",
+      "skills": "Aluw satuw",
+      "description": ".",
+      "contact": "."
+    },
+    "id": 5146529501,
+    "created_at": "2025-07-14T11:10:01.855810",
+    "balance": 0.0
+  },
+  "7857699576": {
+    "first_name": "Атджанов_Пена",
+    "username": "pena_han",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Pena",
+      "skills": "Ussa",
+      "description": "23 yasymda",
+      "contact": "+9936***"
+    },
+    "id": 7857699576,
+    "created_at": "2025-07-14T11:25:46.699287",
+    "balance": 0.0
+  },
+  "5307248874": {
+    "first_name": "Tm",
+    "username": "Tradetm95",
+    "language": "tm",
+    "role": "freelancer",
+    "profile": {
+      "name": "Azat",
+      "skills": "Logo, Sayt döretmek, widio montaj",
+      "description": "Men 15ýyl bäri logo ýasamak widio montaž bilen meşgullanyp gelýän",
+      "contact": "+99364378488"
+    },
+    "id": 5307248874,
+    "created_at": "2025-07-14T11:26:06.285711",
+    "balance": 0.0
+  },
+  "7670770403": {
+    "first_name": "Maýor⁷⁷⁷",
+    "username": "mayor_777_th",
+    "language": "tm",
+    "role": "client",
+    "profile": {
+      "name": "Osmanow",
+      "skills": "Logo dizayner",
+      "description": "---",
+      "contact": "+99371583082"
+    },
+    "id": 7670770403,
+    "created_at": "2025-07-14T15:16:31.785514",
+    "balance": 0.0
+  }
+}
